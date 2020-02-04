@@ -27,41 +27,22 @@
 
 const char *gengetopt_args_info_purpose = "";
 
-const char *gengetopt_args_info_usage = "Usage: karp-rabin [OPTIONS]... [nnamed-opts]...";
+const char *gengetopt_args_info_usage = "Usage: bitap [OPTIONS]... [nnamed-opts]...";
 
 const char *gengetopt_args_info_versiontext = "";
 
-const char *gengetopt_args_info_description = "Implementation of the Karp-Rabin algorithm";
+const char *gengetopt_args_info_description = "Implementation of the bitap algorithm";
 
-const char *gengetopt_args_info_detailed_help[] = {
-  "  -h, --help             Print help and exit",
-  "      --detailed-help    Print help, including all details and hidden options,\n                           and exit",
-  "  -V, --version          Print version and exit",
-  "  -t, --text=filename    Text file",
-  "  -p, --pattern=pattern  Pattern",
-  "  -r, --rounds=INT       Number of rounds to eliminate false positive\n                           (default=`1')",
-  "  \n\n  The text file is in FASTA format.\n\n  ---------------------------\n",
+const char *gengetopt_args_info_help[] = {
+  "  -h, --help              Print help and exit",
+  "  -V, --version           Print version and exit",
+  "  -t, --text=filename     Text file",
+  "  -p, --pattern=filename  Pattern file",
     0
 };
 
-static void
-init_help_array(void)
-{
-  gengetopt_args_info_help[0] = gengetopt_args_info_detailed_help[0];
-  gengetopt_args_info_help[1] = gengetopt_args_info_detailed_help[1];
-  gengetopt_args_info_help[2] = gengetopt_args_info_detailed_help[2];
-  gengetopt_args_info_help[3] = gengetopt_args_info_detailed_help[3];
-  gengetopt_args_info_help[4] = gengetopt_args_info_detailed_help[4];
-  gengetopt_args_info_help[5] = gengetopt_args_info_detailed_help[5];
-  gengetopt_args_info_help[6] = 0; 
-  
-}
-
-const char *gengetopt_args_info_help[7];
-
 typedef enum {ARG_NO
   , ARG_STRING
-  , ARG_INT
 } cmdline_parser_arg_type;
 
 static
@@ -83,11 +64,9 @@ static
 void clear_given (struct gengetopt_args_info *args_info)
 {
   args_info->help_given = 0 ;
-  args_info->detailed_help_given = 0 ;
   args_info->version_given = 0 ;
   args_info->text_given = 0 ;
   args_info->pattern_given = 0 ;
-  args_info->rounds_given = 0 ;
 }
 
 static
@@ -98,8 +77,6 @@ void clear_args (struct gengetopt_args_info *args_info)
   args_info->text_orig = NULL;
   args_info->pattern_arg = NULL;
   args_info->pattern_orig = NULL;
-  args_info->rounds_arg = 1;
-  args_info->rounds_orig = NULL;
   
 }
 
@@ -107,13 +84,11 @@ static
 void init_args_info(struct gengetopt_args_info *args_info)
 {
 
-  init_help_array(); 
-  args_info->help_help = gengetopt_args_info_detailed_help[0] ;
-  args_info->detailed_help_help = gengetopt_args_info_detailed_help[1] ;
-  args_info->version_help = gengetopt_args_info_detailed_help[2] ;
-  args_info->text_help = gengetopt_args_info_detailed_help[3] ;
-  args_info->pattern_help = gengetopt_args_info_detailed_help[4] ;
-  args_info->rounds_help = gengetopt_args_info_detailed_help[5] ;
+
+  args_info->help_help = gengetopt_args_info_help[0] ;
+  args_info->version_help = gengetopt_args_info_help[1] ;
+  args_info->text_help = gengetopt_args_info_help[2] ;
+  args_info->pattern_help = gengetopt_args_info_help[3] ;
   
 }
 
@@ -150,15 +125,6 @@ cmdline_parser_print_help (void)
   print_help_common();
   while (gengetopt_args_info_help[i])
     printf("%s\n", gengetopt_args_info_help[i++]);
-}
-
-void
-cmdline_parser_print_detailed_help (void)
-{
-  int i = 0;
-  print_help_common();
-  while (gengetopt_args_info_detailed_help[i])
-    printf("%s\n", gengetopt_args_info_detailed_help[i++]);
 }
 
 void
@@ -213,7 +179,6 @@ cmdline_parser_release (struct gengetopt_args_info *args_info)
   free_string_field (&(args_info->text_orig));
   free_string_field (&(args_info->pattern_arg));
   free_string_field (&(args_info->pattern_orig));
-  free_string_field (&(args_info->rounds_orig));
   
   
   for (i = 0; i < args_info->inputs_num; ++i)
@@ -251,16 +216,12 @@ cmdline_parser_dump(FILE *outfile, struct gengetopt_args_info *args_info)
 
   if (args_info->help_given)
     write_into_file(outfile, "help", 0, 0 );
-  if (args_info->detailed_help_given)
-    write_into_file(outfile, "detailed-help", 0, 0 );
   if (args_info->version_given)
     write_into_file(outfile, "version", 0, 0 );
   if (args_info->text_given)
     write_into_file(outfile, "text", args_info->text_orig, 0);
   if (args_info->pattern_given)
     write_into_file(outfile, "pattern", args_info->pattern_orig, 0);
-  if (args_info->rounds_given)
-    write_into_file(outfile, "rounds", args_info->rounds_orig, 0);
   
 
   i = EXIT_SUCCESS;
@@ -461,9 +422,6 @@ int update_arg(void *field, char **orig_field,
     val = possible_values[found];
 
   switch(arg_type) {
-  case ARG_INT:
-    if (val) *((int *)field) = strtol (val, &stop_char, 0);
-    break;
   case ARG_STRING:
     if (val) {
       string_field = (char **)field;
@@ -476,17 +434,6 @@ int update_arg(void *field, char **orig_field,
     break;
   };
 
-  /* check numeric conversion */
-  switch(arg_type) {
-  case ARG_INT:
-    if (val && !(stop_char && *stop_char == '\0')) {
-      fprintf(stderr, "%s: invalid numeric value: %s\n", package_name, val);
-      return 1; /* failure */
-    }
-    break;
-  default:
-    ;
-  };
 
   /* store the original value */
   switch(arg_type) {
@@ -546,15 +493,13 @@ cmdline_parser_internal (
 
       static struct option long_options[] = {
         { "help",	0, NULL, 'h' },
-        { "detailed-help",	0, NULL, 0 },
         { "version",	0, NULL, 'V' },
         { "text",	1, NULL, 't' },
         { "pattern",	1, NULL, 'p' },
-        { "rounds",	1, NULL, 'r' },
         { 0,  0, 0, 0 }
       };
 
-      c = getopt_long (argc, argv, "hVt:p:r:", long_options, &option_index);
+      c = getopt_long (argc, argv, "hVt:p:", long_options, &option_index);
 
       if (c == -1) break;	/* Exit from `while (1)' loop.  */
 
@@ -582,7 +527,7 @@ cmdline_parser_internal (
             goto failure;
         
           break;
-        case 'p':	/* Pattern.  */
+        case 'p':	/* Pattern file.  */
         
         
           if (update_arg( (void *)&(args_info->pattern_arg), 
@@ -594,26 +539,8 @@ cmdline_parser_internal (
             goto failure;
         
           break;
-        case 'r':	/* Number of rounds to eliminate false positive.  */
-        
-        
-          if (update_arg( (void *)&(args_info->rounds_arg), 
-               &(args_info->rounds_orig), &(args_info->rounds_given),
-              &(local_args_info.rounds_given), optarg, 0, "1", ARG_INT,
-              check_ambiguity, override, 0, 0,
-              "rounds", 'r',
-              additional_error))
-            goto failure;
-        
-          break;
 
         case 0:	/* Long option with no short option */
-          if (strcmp (long_options[option_index].name, "detailed-help") == 0) {
-            cmdline_parser_print_detailed_help ();
-            cmdline_parser_free (&local_args_info);
-            exit (EXIT_SUCCESS);
-          }
-
         case '?':	/* Invalid option.  */
           /* `getopt_long' already printed an error message.  */
           goto failure;

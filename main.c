@@ -5,7 +5,7 @@
 #include <math.h>
 #include <assert.h>
 #include <stdlib.h>
-#include "cmdline.h"
+//#include "cmdline.h"
 
 char* substr(const char *src, int m, int n){
   // lunghezza della stringa di destinazione
@@ -70,24 +70,17 @@ int* bitap(char* pattern, char* text){
     else
       D[i] = 0;
   }
-  
   return D;
 }
 
 
-// struttura per restituire sia l'array delle soluzioni che il numero di esse
-/* struct array{ */
-/*   int* sol; */
-/*   unsigned int count; */
-/* }; */
-
 // funzione che effettua il bitap su pattern più lunghi della grandezza della
 // word
 void bitapLong(char* pattern, char* text){
-  // inizializzo lunghezza di pattern e testo
-  unsigned int m = strlen(pattern);
-  unsigned int p = strlen(text);
- 
+  
+  // inizializzo lunghezza di pattern e testo (-1 per terminatore)
+  unsigned int m = strlen(pattern) - 1;
+  unsigned int p = strlen(text) - 1;
   // inizializzo la grandezza massima della word
   unsigned int w = __WORDSIZE;
 
@@ -142,12 +135,13 @@ void bitapLong(char* pattern, char* text){
 	DL[i][j]=0;
     }
   }
-  for(unsigned int i = 1; i < npatterns; i++){
-    for(unsigned int j = 0; j < p; j++){
-      printf("%d ", DL[i][j]);
-    }
-    puts("\n\n\n\n");
-  }
+  // stampa matrici
+  /* for(unsigned int i = 0; i < npatterns; i++){ */
+  /*   for(unsigned int j = 0; j < p; j++){ */
+  /*     printf("%d ", DL[i][j]); */
+  /*   } */
+  /*   puts("\n\n\n\n"); */
+  /* } */
  
   // inizializzo il count dei match
   unsigned count = 0;
@@ -190,22 +184,24 @@ char* charge_file(char* file_name) {
   FILE *fp;
   fp = fopen(file_name, "r"); // apro in lettura
   if (fp == NULL) {
+    printf("%s\n", file_name);
     fprintf(stderr, "Can't open input file\n");
     exit(1);
   }
   
-  unsigned int size = 0;
+  unsigned int size = -1;
   char c = (char)fgetc(fp); // fgetc legge un char dallo stream
-  while (c != EOF) { // itero fino a che ho caratteri 
+  while (c != EOF) {
+    size++;// itero fino a che ho caratteri 
     c = (char)fgetc(fp); // carico in c il carattere successivo
-    size++;
+    
   }
   fclose(fp);
-  
+  //printf("%d\n", size);
   fp = fopen(file_name, "r");
   // dichiaro un array di char lungo quanto il file
   char *str = (char*)malloc(sizeof(char) * (size + 1)); 
-  str[0] = '\0';
+  
   char cc = (char)fgetc(fp); // fgetc legge un char dallo stream
   while (cc != EOF) { // itero fino a che ho caratteri 
     strncat(str, &cc, 1); // appendo il carattere alla stringa
@@ -215,16 +211,49 @@ char* charge_file(char* file_name) {
   return str;
 }
 
+char* read_file(char* file_name){
+  FILE *fp;
+  fp = fopen(file_name, "r"); // apro in lettura
+  if (fp == NULL) {
+    printf("%s\n", file_name);
+    fprintf(stderr, "Can't open input file\n");
+    exit(1);
+  }
+  
+  unsigned int size = 0;
+  char c = (char)fgetc(fp); // fgetc legge un char dallo stream
+  while (c != EOF) {
+    size++;// itero fino a che ho caratteri
+    c = (char)fgetc(fp); // carico in c il carattere successivo
+  }
+  fclose(fp);
+  char *str = (char*)malloc(sizeof(char) * (size));
+  unsigned int i=0;
+  fp = fopen(file_name, "r");
+  while (i < size) {
+    fscanf(fp , "%c" ,&c);
+      str[i] = c;
+      i++;
+    }
+  return str;
+}
 
 int main(int argc, char** argv){
-  static struct gengetopt_args_info args_info;
-  assert(cmdline_parser(argc, argv, &args_info) == 0);
-  char* pattern = args_info.pattern_orig;
-  char* text = charge_file(args_info.text_arg);
+  if(argc != 3)
+    exit(-1);
   
-  /* char* pattern = "aacccaa"; */
-  /* char* text = "caacccaacaaccccccaac"; */
+  char* text = read_file(argv[1]);
+  char* pattern = read_file(argv[2]);
   
-  printf("for pattern %s\n", pattern);
-  bitapLong(pattern, text); 
+  
+  /* char* pattern = "uic"; */
+  /* char* text = "cacacacaccccccacacacacacabbbcbbdbdjcdckdckdckdcbihvvfnvfjvnhrfiurvbuicnhrehgmreouhwovxbuicrrhuxbgrvhmibrx"; */
+  
+  printf("for pattern: %s\n", pattern);
+  printf("in text: %s\n", text);
+
+  bitapLong(pattern, text);
+  //free(text);
+  //free(pattern);
+  return 0;
 }

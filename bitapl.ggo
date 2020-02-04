@@ -1,12 +1,8 @@
-package "karp-rabin"
-version "0.1.0"
-description "Implementation of the Karp-Rabin algorithm"
+package "bitap"
+version "0.0.1"
+description "Implementation of the bitap algorithm"
 args "--unamed-opts"
 
 # Options
 option  "text"		t "Text file"			string	typestr="filename"
-option  "pattern"	p "Pattern"			string  typestr="pattern"
-option 	"rounds" 	r "Number of rounds to eliminate false positive" 	int optional default="1"
-details="\n
-The text file is in FASTA format.\n
----------------------------\n"
+option  "pattern"	p "Pattern file"			string  typestr="filename"

@@ -21,41 +21,35 @@ extern "C" {
 
 #ifndef CMDLINE_PARSER_PACKAGE
 /** @brief the program name (used for printing errors) */
-#define CMDLINE_PARSER_PACKAGE "karp-rabin"
+#define CMDLINE_PARSER_PACKAGE "bitap"
 #endif
 
 #ifndef CMDLINE_PARSER_PACKAGE_NAME
 /** @brief the complete program name (used for help and version) */
-#define CMDLINE_PARSER_PACKAGE_NAME "karp-rabin"
+#define CMDLINE_PARSER_PACKAGE_NAME "bitap"
 #endif
 
 #ifndef CMDLINE_PARSER_VERSION
 /** @brief the program version */
-#define CMDLINE_PARSER_VERSION "0.1.0"
+#define CMDLINE_PARSER_VERSION "0.0.1"
 #endif
 
 /** @brief Where the command line options are stored */
 struct gengetopt_args_info
 {
   const char *help_help; /**< @brief Print help and exit help description.  */
-  const char *detailed_help_help; /**< @brief Print help, including all details and hidden options, and exit help description.  */
   const char *version_help; /**< @brief Print version and exit help description.  */
   char * text_arg;	/**< @brief Text file.  */
   char * text_orig;	/**< @brief Text file original value given at command line.  */
   const char *text_help; /**< @brief Text file help description.  */
-  char * pattern_arg;	/**< @brief Pattern.  */
-  char * pattern_orig;	/**< @brief Pattern original value given at command line.  */
-  const char *pattern_help; /**< @brief Pattern help description.  */
-  int rounds_arg;	/**< @brief Number of rounds to eliminate false positive (default='1').  */
-  char * rounds_orig;	/**< @brief Number of rounds to eliminate false positive original value given at command line.  */
-  const char *rounds_help; /**< @brief Number of rounds to eliminate false positive help description.  */
+  char * pattern_arg;	/**< @brief Pattern file.  */
+  char * pattern_orig;	/**< @brief Pattern file original value given at command line.  */
+  const char *pattern_help; /**< @brief Pattern file help description.  */
   
   unsigned int help_given ;	/**< @brief Whether help was given.  */
-  unsigned int detailed_help_given ;	/**< @brief Whether detailed-help was given.  */
   unsigned int version_given ;	/**< @brief Whether version was given.  */
   unsigned int text_given ;	/**< @brief Whether text was given.  */
   unsigned int pattern_given ;	/**< @brief Whether pattern was given.  */
-  unsigned int rounds_given ;	/**< @brief Whether rounds was given.  */
 
   char **inputs ; /**< @brief unamed options (options without names) */
   unsigned inputs_num ; /**< @brief unamed options number */
@@ -79,8 +73,6 @@ extern const char *gengetopt_args_info_usage;
 extern const char *gengetopt_args_info_description;
 /** @brief all the lines making the help output */
 extern const char *gengetopt_args_info_help[];
-/** @brief all the lines making the detailed help output (including hidden options and details) */
-extern const char *gengetopt_args_info_detailed_help[];
 
 /**
  * The command line parser
@@ -142,10 +134,6 @@ int cmdline_parser_file_save(const char *filename,
  * Print the help
  */
 void cmdline_parser_print_help(void);
-/**
- * Print the detailed help (including hidden options and details)
- */
-void cmdline_parser_print_detailed_help(void);
 /**
  * Print the version
  */

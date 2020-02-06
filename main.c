@@ -20,6 +20,7 @@ int main(int argc, char** argv){
 
   // chiamo l'algoritmo 
   bitapLong(pattern, text);
+
   free(text);
   free(pattern);
   return 0;

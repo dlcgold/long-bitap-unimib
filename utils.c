@@ -1,5 +1,7 @@
 #include "utils.h"
 
+// funzione per sottostringa da indice n a indice m
+// O(|substr|)
 char* substr(const char *src, int m, int n){
   // lunghezza della stringa di destinazione
   int len = n - m;
@@ -24,16 +26,19 @@ char* substr(const char *src, int m, int n){
 
 // funzione che effettua la ricerca tramite algoritmo bitap con
 // lunghezza del pattern minore della grandezza della word
-int* bitap(char* pattern, char* text){
+// O(m + p)
+uint64_t* bitap(char* pattern, char* text){
   
   // inizializzo lunghezza di pattern e testo
   // inizializzo a 0 l'array T con le posizioni dei char nel pattern
-  unsigned int m = strlen(pattern);
-  unsigned int p = strlen(text);
-  unsigned int T[CHAR_MAX] = {};
+  uint64_t m = strlen(pattern);
+  uint64_t p = strlen(text);
+  uint64_t T[CHAR_MAX] = {};
+  // 1 esplcitamente a 64bit
+  int64_t one = 1;
 
   // inizializzo la mia "matrice" di word
-  int* D = (int *)malloc(sizeof(int) * p);
+  uint64_t* D = (uint64_t *)malloc(sizeof(uint64_t) * p);
  
   // PREPROCESAMENTO
   // si parte con ogni posizione di T a 0
@@ -42,41 +47,46 @@ int* bitap(char* pattern, char* text){
   // posizioni con il vecchio contenuto di T per un determinato char
   // alla fine del ciclo avrò l'array T caricato
   for(unsigned int i = 0; i < m; i++){
-    T[(int)pattern[i]] |= (1<<i);
+    T[(int)pattern[i]] |= (one<<i);
   }
  
   // seguo l'algoritmo e setto 1 a M[0] sse pattern e text cominciano con lo
   // stesso carattere
   D[0] = (pattern[0] == text[0]) ? 1 : 0;
 
+  
   // formula dell'algoritmo per calcolare le colonne a partire dalla precedente
   for(unsigned int i = 1; i < p; i++){
-    D[i] = ((D[i - 1] << 1) | 1) & T[(int)text[i]];
+    D[i] = ((D[i - 1] << one) | one) & T[(int)text[i]];
   }
-  
+
+  //int* ret = (int*)malloc(sizeof(int) * p);
   // guardo se ho match o meno guardando l'ultimo bit
   // per comodità setto quella posizione a 1 specificando
   // che lì termina un match
-  for(unsigned int i = 0; i < p; i++){ 
-    if((D[i] & (1<<(m-1))) != 0)
+  for(unsigned int i = 0; i < p; i++){
+    if((D[i] & (one<<(m-1))) != 0)
       D[i] = 1;
     else
       D[i] = 0;
   }
+  
   return D;
 }
 
 
 // funzione che effettua il bitap su pattern più lunghi della grandezza della
 // word
+// O(p * ceil(m / w))
 void bitapLong(char* pattern, char* text){
   
   // inizializzo lunghezza di pattern e testo (-1 per terminatore)
   unsigned int m = strlen(pattern) - 1;
   unsigned int p = strlen(text) - 1;
+  
   // inizializzo la grandezza massima della word
   unsigned int w = __WORDSIZE;
-
+  
  
   // conto in quanti sottopattern devo dividere il pattern per non eccedere da w
   unsigned int npatterns = ceil((double) m / w);
@@ -101,16 +111,16 @@ void bitapLong(char* pattern, char* text){
   }
  
   // creo la matrice coi singoli bitap per sottopattern
-  int** DL = (int **)malloc(npatterns * sizeof(int *));
+  uint64_t** DL = (uint64_t **)malloc(npatterns * sizeof(uint64_t *));
   for (unsigned int i=0; i < npatterns; i++)
-    DL[i] = (int *)malloc(p * sizeof(int)); 
+    DL[i] = (uint64_t *)malloc(p * sizeof(uint64_t)); 
 
   // carico le righe con i singoli dei bitap
-  int* bitapres;
+  uint64_t* bitapres;
   for(unsigned int i = 0; i < npatterns; i++){
     bitapres = bitap(patterns[i], text);
     // copio l'array resitutito da bitap nella rige e libero memoria
-    memcpy(DL[i], bitapres, p * sizeof(int));
+    memcpy(DL[i], bitapres, p * sizeof(uint64_t));
     free(bitapres);
   }
   
@@ -129,12 +139,13 @@ void bitapLong(char* pattern, char* text){
     }
   }
   // stampa matrici
-  /* for(unsigned int i = 0; i < npatterns; i++){ */
-  /*   for(unsigned int j = 0; j < p; j++){ */
-  /*     printf("%d ", DL[i][j]); */
-  /*   } */
-  /*   puts("\n\n\n\n"); */
-  /* } */
+  for(unsigned int i = 0; i < npatterns; i++){
+    printf("pattern: %s\n", patterns[i]);
+    for(unsigned int j = 0; j < p; j++){
+      printf("%ld ", DL[i][j]);
+    }
+    puts("\n\n\n\n");
+  }
  
   // inizializzo il count dei match
   unsigned count = 0;
@@ -187,6 +198,7 @@ char* read_file(char* file_name){
     c = (char)fgetc(fp); // carico in c il carattere successivo
   }
   fclose(fp);
+  printf("%d\n", size);
   char *str = (char*)malloc(sizeof(char) * (size));
   unsigned int i=0;
   fp = fopen(file_name, "r");
@@ -201,6 +213,19 @@ char* read_file(char* file_name){
     c = (char)fgetc(fp); // carico in c il carattere successivo
     str[++i] = c;  
   }
+  printf("%ld\n", strlen(str));
   return str;
 }
 
+char* read_text(char* filename) {
+  gzFile fp;
+  kseq_t *seq;
+  fp = gzopen(filename, "r");
+  assert(fp != NULL && "Could not open fasta file\n");
+  seq = kseq_init(fp);
+  int res = kseq_read(seq);
+  assert(res >= 0);
+  gzclose(fp);
+  return seq->seq.s;
+  // kseq_destroy(seq);
+}

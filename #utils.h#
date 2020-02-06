@@ -9,8 +9,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <inttypes.h>
-#include "klib/kseq.h"
-#include <zlib.h>
+
 
 char* substr(const char*, int, int);
 uint64_t* bitap(char*, char*);

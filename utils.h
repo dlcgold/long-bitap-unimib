@@ -9,13 +9,13 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <inttypes.h>
-#include "klib/kseq.h"
-#include <zlib.h>
+#include "cmdline.h"
 
 char* substr(const char*, int, int);
 uint64_t* bitap(char*, char*);
 void bitapLong(char*, char*);
 char* read_file(char*);
+char* load_file(char*);
 
 #endif
 

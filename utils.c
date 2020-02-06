@@ -139,13 +139,13 @@ void bitapLong(char* pattern, char* text){
     }
   }
   // stampa matrici
-  for(unsigned int i = 0; i < npatterns; i++){
-    printf("pattern: %s\n", patterns[i]);
-    for(unsigned int j = 0; j < p; j++){
-      printf("%ld ", DL[i][j]);
-    }
-    puts("\n\n\n\n");
-  }
+  /* for(unsigned int i = 0; i < npatterns; i++){ */
+  /*   printf("pattern: %s\n", patterns[i]); */
+  /*   for(unsigned int j = 0; j < p; j++){ */
+  /*     printf("%ld ", DL[i][j]); */
+  /*   } */
+  /*   puts("\n\n\n\n"); */
+  /* } */
  
   // inizializzo il count dei match
   unsigned count = 0;
@@ -217,15 +217,25 @@ char* read_file(char* file_name){
   return str;
 }
 
-char* read_text(char* filename) {
-  gzFile fp;
-  kseq_t *seq;
-  fp = gzopen(filename, "r");
-  assert(fp != NULL && "Could not open fasta file\n");
-  seq = kseq_init(fp);
-  int res = kseq_read(seq);
-  assert(res >= 0);
-  gzclose(fp);
-  return seq->seq.s;
-  // kseq_destroy(seq);
+char* load_file(char* path)
+{
+    char* buffer = 0;
+    long length;
+    FILE * f = fopen (path, "rb"); //was "rb"
+
+    if (f)
+    {
+      fseek (f, 0, SEEK_END);
+      length = ftell (f);
+      fseek (f, 0, SEEK_SET);
+      buffer = (char*)malloc ((length+1)*sizeof(char));
+      if (buffer)
+      {
+        fread (buffer, sizeof(char), length, f);
+      }
+      fclose (f);
+    }
+    //buffer[length] = '\0';
+
+    return buffer;
 }

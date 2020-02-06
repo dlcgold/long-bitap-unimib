@@ -1,21 +1,26 @@
 #include "utils.h"
 
 int main(int argc, char** argv){
-  if(argc != 3)
-    exit(-1);
-  
-  char* text = read_text(argv[1]);
-  char* pattern = read_text(argv[2]);
-  
-  
-  /* char* pattern = "uic"; */
-  /* char* text = "cacacacaccccccacacacacacabbbcbbdbdjcdckdckdckdcbihvvfnvfjvnhrfiurvbuicnhrehgmreouhwovxbuicrrhuxbgrvhmibrx"; */
-  
-  printf("for pattern: %s\nof length %ld\n", pattern, strlen(pattern) - 1);
-  printf("in text: %s\nof length %ld\n", text, strlen(text) - 1);
+  static struct gengetopt_args_info args_info;
+  assert(cmdline_parser(argc, argv, &args_info) == 0);
 
+  /* if(argc != 3) */
+  /*   exit(-1); */
+
+  // carico i file nei rispettivi array di char
+  /* char* text = load_file(argv[1]); */
+  /* char* pattern = load_file(argv[2]); */
+  
+  char* pattern = load_file(args_info.pattern_arg);
+  char* text = load_file(args_info.text_arg);
+
+  // stampo pattern e testo (con le rispettive lunghezze)
+  /* printf("for pattern: %s\nof length %ld\n", pattern, strlen(pattern) - 1); */
+  /* printf("in text: %s\nof length %ld\n", text, strlen(text) - 1); */
+
+  // chiamo l'algoritmo 
   bitapLong(pattern, text);
-  //free(text);
-  //free(pattern);
+  free(text);
+  free(pattern);
   return 0;
 }

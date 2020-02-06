@@ -15,8 +15,8 @@ int main(int argc, char** argv){
   char* text = load_file(args_info.text_arg);
 
   // stampo pattern e testo (con le rispettive lunghezze)
-  /* printf("for pattern: %s\nof length %ld\n", pattern, strlen(pattern) - 1); */
-  /* printf("in text: %s\nof length %ld\n", text, strlen(text) - 1); */
+  printf("pattern length %ld\n", strlen(pattern) - 1); 
+  printf("text length %ld\n", strlen(text) - 1); 
 
   // chiamo l'algoritmo 
   bitapLong(pattern, text);

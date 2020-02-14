@@ -65,10 +65,7 @@ uint64_t* bitap(char* pattern, char* text){
   // per comodità setto quella posizione a 1 specificando
   // che lì termina un match
   for(unsigned int i = 0; i < p; i++){
-    if((D[i] & (one<<(m-1))) != 0)
-      D[i] = 1;
-    else
-      D[i] = 0;
+    D[i] = ((D[i] & (one<<(m-1))) != 0) ? 1 : 0;
   }
   /* print(D, p); */
   /* puts("\n"); */
@@ -154,8 +151,9 @@ void bitapLong(char* pattern, char* text){
   uint64_t* prev = (uint64_t*)malloc(sizeof(uint64_t) * p);
   uint64_t* curr;
   uint64_t* res = bitap(patterns[0], text);
-  uint64_t beg = 0;
-
+  //uint64_t beg = 0;
+  uint64_t begone = 0;
+  uint64_t end = strlen(patterns[0]);
   for(unsigned int i = 1; i < npatterns; i++){
     // copio res in prev
     memcpy(prev, res, p * sizeof(uint64_t));
@@ -163,13 +161,28 @@ void bitapLong(char* pattern, char* text){
     // carico cur
     curr = bitap(patterns[i], text);
 
+    // todo nell'ultima posizione di bitap salvare indice primo 1
+    // carico in begone la posizione del primo match per risparmiare calcoli
+    for(unsigned int j = begone; j < m; j++){
+      if(res[j] == 1){
+	begone = j;
+	break;
+      }
+    }
+    // se begone è nullo e pattern non inizia come text significa che non ho
+    // match e in tal caso interrompo
+    if(begone == 0 && pattern[0] != text[0]){
+      printf("no occurences");
+      exit(-1);
+    }
     // carico res
-    for(unsigned int j = beg; j < p; j++){
+    for(unsigned int j = begone; j < p; j++){
       res[j] = (curr[j] == 1 && prev[j - strlen(patterns[i])] == 1) ? 1 : 0;
     }
 
+  
     // sposto la finestra di indici inutili
-    beg += strlen(patterns[i]);
+    end += strlen(patterns[i]);
   }
  
   // libero la memoria

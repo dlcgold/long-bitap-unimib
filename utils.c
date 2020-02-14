@@ -81,8 +81,8 @@ uint64_t* bitap(char* pattern, char* text){
 void bitapLong(char* pattern, char* text){
 
   // inizializzo lunghezza di pattern e testo (-1 per terminatore)
-  unsigned int m = strlen(pattern) ;
-  unsigned int p = strlen(text) ;
+  unsigned int m = strlen(pattern) - 1;
+  unsigned int p = strlen(text) - 1 ;
 
   // inizializzo la grandezza massima della word
   //unsigned int w = __WORDSIZE;
@@ -150,21 +150,22 @@ void bitapLong(char* pattern, char* text){
   uint64_t* res = bitap(patterns[0], text);
   uint64_t beg = 0;
   for(unsigned int i = 1; i < npatterns; i++){
-
+    //printf("%ld\n", beg);
     memcpy(prev, res, p * sizeof(uint64_t));
-
+    //print(prev, p);
     curr = bitap(patterns[i], text);
 
-    for(unsigned int j = beg; j < p; j++){
+    for(unsigned int j = 0; j < p; j++){
       res[j] = (curr[j] == 1 && prev[j - strlen(patterns[i])] == 1) ? 1 : 0;
     }
-
-    beg+=strlen(patterns[i]);
+    //free(curr);
+    //free(prev);
+    //beg+=strlen(patterns[i]);
   }
   //printf("%d\n",beg);
 
-free(curr);
-free(prev);
+  free(curr);
+  free(prev);
 
 
   // inizializzo il count dei match

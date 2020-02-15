@@ -177,7 +177,6 @@ void bitapLong(char* pattern, char* text){
     // carico cur
     curr = bitap(patterns[i], text, patternlength, p);
 
-    
     // se begone è -1 significa che non ho
     // match e in tal caso interrompo
     if(begone == -1){
@@ -185,12 +184,12 @@ void bitapLong(char* pattern, char* text){
       exit(-1);
     }
     // carico res 
-    for(unsigned int j = begone ; j < p; j++){
+    for(unsigned int j = begone; j < p; j++){
       res[j] = (curr[j] == 1 && prev[j - strlen(patterns[i])] == 1) ? 1 : 0;
     }
     
   }
- 
+
   // libero la memoria
   if(npatterns != 1){
     free(curr);

@@ -36,8 +36,9 @@ uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
   uint64_t T[CHAR_MAX] = {};
   // 1 esplcitamente a 64bit
   int64_t one = 1;
+  uint64_t approx = p / m;
   // inizializzo la mia "matrice" di word
-  uint64_t* D = (uint64_t *)malloc(sizeof(uint64_t) * (p + 1));
+  uint64_t* D = (uint64_t *)malloc(sizeof(uint64_t) * (p + approx));
 
   // PREPROCESAMENTO
   // si parte con ogni posizione di T a 0
@@ -62,21 +63,35 @@ uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
   // guardo se ho match o meno guardando l'ultimo bit
   // per comodità setto quella posizione a 1 specificando
   // che lì termina un match
-  bool find = false;
-  D[p] = 1;
+  /* bool find = false; */
+  /* D[p] = 1; */
+  /* for(unsigned int i = 0; i < p; i++){ */
+  /*   //D[i] = ((D[i] & (one<<(m-1))) != 0) ? 1 : 0; */
+  /*   if((D[i] & (one<<(m-1))) != 0){ */
+  /*     D[i] = 1; */
+  /*     if(find == false){ */
+  /* 	D[p] = i; */
+  /* 	find = true; */
+  /*     } */
+  /*   }else{ */
+  /*     D[i] = 0; */
+  /*   } */
+  /* } */
+
+  uint64_t end = p;
   for(unsigned int i = 0; i < p; i++){
-    //D[i] = ((D[i] & (one<<(m-1))) != 0) ? 1 : 0;
     if((D[i] & (one<<(m-1))) != 0){
       D[i] = 1;
-      if(find == false){
-	D[p] = i;
-	find = true;
-      }
+      D[end] = i;
+      end++;
     }else{
       D[i] = 0;
     }
   }
-
+  /* print(D,p); */
+  /* puts("\n"); */
+  /* print(D,p+approx); */
+  /* puts("\n"); */
   return D;
 }
 
@@ -92,7 +107,7 @@ void bitapLong(char* pattern, char* text){
 
   // inizializzo la grandezza massima della word
   uint64_t w = __WORDSIZE;
-  //uint64_t w = 3;
+  //uint64_t w = 4;
   
   // conto in quanti sottopattern devo dividere il pattern per non eccedere da w
   unsigned int npatterns = ceil((double) m / w);
@@ -160,93 +175,124 @@ void bitapLong(char* pattern, char* text){
   uint64_t* prev = (uint64_t*)malloc(sizeof(uint64_t) * (p + 1));
   uint64_t* curr;
   uint64_t patternlength = (npatterns != 1) ? w : strlen(patterns[0]);
-  //printf("%ld\n", patternlength);
   uint64_t* res = bitap(patterns[0], text, patternlength, p);
-  //printf("inizio: %s\n", patterns[0]);
   int64_t begone = 0;
   uint64_t begpat = 0;
-  //printf("first:\t");
-  //print(res, p+1);
-  puts("\n");
-  for(unsigned int i = 1; i < npatterns; i++){
-    //printf("%s:\n", patterns[i]);
+
+  /* for(unsigned int i = 1; i < npatterns; i++){ */
+  /*   printf("%s:\n", patterns[i]); */
       
-    if(i != npatterns -1){
-      patternlength = w;
-      begpat += w;
-    }else{
-      patternlength = strlen(patterns[i]);
-      begpat += strlen(patterns[i]);
-    }
-    // carico in begone la posizione del primo match per risparmiare calcoli
-    //begone = res[p];
-    // printf("%ld %ld\n", begpat,begone);
+  /*   if(i != npatterns -1){ */
+  /*     patternlength = w; */
+  /*     begpat += w; */
+  /*   }else{ */
+  /*     patternlength = strlen(patterns[i]); */
+  /*     begpat += strlen(patterns[i]); */
+  /*   } */
+  /*   // carico in begone la posizione del primo match per risparmiare calcoli */
+  /*   //begone = res[p]; */
+  /*   // printf("%ld %ld\n", begpat,begone); */
 
-    //print(prev, p+1);
-    // copio res in prev a partire dal primo 1
-    memcpy(prev, res, p * sizeof(uint64_t));
-    //printf("prev:\t");
-    //print(prev, p+1);
-    //puts("\n");
-    // carico cur
-    //printf("curr:\t");
-    curr = bitap(patterns[i], text, patternlength, p);
-    //print(curr, p+1);
-    //puts("\n");
-    // se begone è -1 significa che non ho
-    // match e in tal caso interrompo
-    if(begone == -1){
-      printf("no occurences");
-      exit(-1);
+  /*   //print(prev, p+1); */
+  /*   // copio res in prev a partire dal primo 1 */
+  /*   memcpy(prev, res, p * sizeof(uint64_t)); */
+  /*   printf("prev:\t"); */
+  /*   print(prev, p+1); */
+  /*   puts("\n"); */
+  /*   // carico cur */
+  /*    printf("curr:\t"); */
+  /*   curr = bitap(patterns[i], text, patternlength, p); */
+  /*   print(curr, p+1); */
+  /*   puts("\n"); */
+  /*   // se begone è -1 significa che non ho */
+  /*   // match e in tal caso interrompo */
+  /*   if(begone == -1){ */
+  /*     printf("no occurences"); */
+  /*     exit(-1); */
+  /*   } */
+  /*   //printf("%ld\n", begone + begpat); */
+  /*   // carico res  */
+  /*   for(unsigned int j = 0; j < p; j++){ */
+  /*     res[j] = (curr[j] == 1 && prev[j - strlen(patterns[i])] == 1) ? 1 : 0; */
+  /*   } */
+  /*   printf("res:\t"); */
+  /*   print(res, p+1); */
+  /*   puts("\n"); */
+  /* } */
+  /* printf("----------------------------------------------------\ndef:\t"); */
+  /* print(res, p+1); */
+  /* puts("\n"); */
+  uint64_t end = p;
+  uint64_t count2 = 0;
+  uint64_t* curr2;
+  char* wind;
+  uint64_t check = res[end];
+  while(npatterns !=1 && check != 0){
+    //printf("%ld %ld\n", end, res[end]);
+    for(unsigned int i = 1; i < npatterns; i++){
+      //printf("%ld %ld\n", res[end], res[end] + strlen(patterns[i]));
+      wind = substr(text, check + 1, check + strlen(patterns[i]) + 1);
+      curr2 = bitap(patterns[i], wind, strlen(patterns[i]), strlen(wind));
+      
+      if(curr2[strlen(wind)-1] != 1)
+	break;
+      check += strlen(wind);
     }
-    //printf("%ld\n", begone + begpat);
-    // carico res 
-    for(unsigned int j = 0; j < p; j++){
-      res[j] = (curr[j] == 1 && prev[j - strlen(patterns[i])] == 1) ? 1 : 0;
+    if(curr2[strlen(wind)-1] == 1){
+      printf("occurrance starting at %ld\n", (check + 1) - (strlen(pattern) - 1));
+      count2++;
     }
-    //printf("res:\t");
-    //print(res, p+1);
-    //puts("\n");
+   
+    end++;
+    check = res[end];
   }
-  //printf("----------------------------------------------------\ndef:\t");
-  //print(res, p+1);
-  //puts("\n");
+  uint64_t* res2;
+  if(npatterns == 1){
+    res2 = bitap(pattern, text, m, p);
+    for(unsigned int i = 0; i < p; i++){
+      if(res[i] == 1){
+	count2++;
+	printf("occurrance starting at index %ld\n", i - (m - 1));
+      }
+    }
+  }
+    
   // libero la memoria
-  if(npatterns != 1){
-    free(curr);
-  }
-  free(prev);
+  /* if(npatterns != 1){ */
+  /*   free(curr); */
+  /* } */
+  /* free(prev); */
 
-  // inizializzo il count dei match
-  unsigned count = 0;
+  /* // inizializzo il count dei match */
+  /* unsigned count = 0; */
 
-  // guardo quali presentano 1 nell'ultima riga, stampo l'indice di partenza
-  // e li conto
+  /* // guardo quali presentano 1 nell'ultima riga, stampo l'indice di partenza */
+  /* // e li conto */
+  /* /\* for(unsigned int i = 0; i < p; i++){ *\/ */
+  /* /\*   if(DL[npatterns-1][i] == 1){ *\/ */
+  /* /\*     count++; *\/ */
+  /* /\*     printf("occurrance starting at index %d\n", i - (m-1)); *\/ */
+  /* /\*   } *\/ */
+  /* /\* } *\/ */
+
   /* for(unsigned int i = 0; i < p; i++){ */
-  /*   if(DL[npatterns-1][i] == 1){ */
+  /*   if(res[i] == 1){ */
   /*     count++; */
-  /*     printf("occurrance starting at index %d\n", i - (m-1)); */
+  /*     printf("occurrance starting at index %ld\n", i - (m - 1)); */
   /*   } */
   /* } */
-
-  for(unsigned int i = 0; i < p; i++){
-    if(res[i] == 1){
-      count++;
-      printf("occurrance starting at index %ld\n", i - (m - 1));
-    }
-  }
-  // stampo conteggio
-  printf("total number of occurences: %d\n", count);
+  /* // stampo conteggio */
+  printf("total number of occurences: %d\n", count2);
 
 
-  // libero la memoria
-  /*for (unsigned int i=0; i < npatterns; i++)
-    free(DL[i]);
-    free(DL);*/
-  for (unsigned int i = 0; i < npatterns; i++)
-    free(patterns[i]);
-  free(patterns);
-  free(res);
+  /* // libero la memoria */
+  /* /\*for (unsigned int i=0; i < npatterns; i++) */
+  /*   free(DL[i]); */
+  /*   free(DL);*\/ */
+  /* for (unsigned int i = 0; i < npatterns; i++) */
+  /*   free(patterns[i]); */
+  /* free(patterns); */
+  /* free(res); */
 }
 
 char* load_file(char* path)

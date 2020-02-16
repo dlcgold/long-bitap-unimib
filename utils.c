@@ -64,7 +64,7 @@ uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
   // per comodità setto quella posizione a 1 specificando
   // che lì termina un match
   bool find = false;
-  D[p] = -1;
+  D[p] = 1;
   for(unsigned int i = 0; i < p; i++){
     //D[i] = ((D[i] & (one<<(m-1))) != 0) ? 1 : 0;
     if((D[i] & (one<<(m-1))) != 0){
@@ -77,6 +77,8 @@ uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
       D[i] = 0;
     }
   }
+  /* print(D,p); */
+  /* puts("\n"); */
   return D;
 }
 
@@ -91,12 +93,13 @@ void bitapLong(char* pattern, char* text){
   uint64_t p = strlen(text) - 1;
 
   // inizializzo la grandezza massima della word
-  uint64_t w = __WORDSIZE;
-  //unsigned int w = 3;
-
+  //uint64_t w = __WORDSIZE;
+  uint64_t w = 3;
+  
   // conto in quanti sottopattern devo dividere il pattern per non eccedere da w
   unsigned int npatterns = ceil((double) m / w);
 
+  
   // alloco un array di stringhe per contenere i vari sottopattern
   char** patterns = (char **)malloc(npatterns * sizeof(char *));
   for (unsigned int i=0; i < npatterns; i++)
@@ -158,38 +161,58 @@ void bitapLong(char* pattern, char* text){
   // inferiori alla lunghezza del mio attuale sottopattern.
   uint64_t* prev = (uint64_t*)malloc(sizeof(uint64_t) * (p + 1));
   uint64_t* curr;
-  uint64_t patternlength = (npatterns != 1) ? 64 : strlen(patterns[1]);
+  uint64_t patternlength = (npatterns != 1) ? w : strlen(patterns[0]);
+  printf("%ld\n", patternlength);
   uint64_t* res = bitap(patterns[0], text, patternlength, p);
-  int64_t begone = 0;  
+  printf("inizio: %s\n", patterns[0]);
+  int64_t begone = 0;
+  uint64_t begpat = 0;
+  printf("first:\t");
+  print(res, p+1);
+  puts("\n");
   for(unsigned int i = 1; i < npatterns; i++){
+    printf("%s:\n", patterns[i]);
+      
     if(i != npatterns -1){
-      patternlength = w;  
+      patternlength = w;
+      begpat += w;
     }else{
       patternlength = strlen(patterns[i]);
+      begpat += strlen(patterns[i]);
     }
-
     // carico in begone la posizione del primo match per risparmiare calcoli
-    begone = res[p];
+    //begone = res[p];
+    // printf("%ld %ld\n", begpat,begone);
+
     //print(prev, p+1);
     // copio res in prev a partire dal primo 1
-    memcpy(prev, res, (p + 1) * sizeof(uint64_t));
-    //print(prev, p);
+    memcpy(prev, res, p * sizeof(uint64_t));
+    printf("prev:\t");
+    print(prev, p+1);
+    puts("\n");
     // carico cur
+     printf("curr:\t");
     curr = bitap(patterns[i], text, patternlength, p);
-
+    print(curr, p+1);
+    puts("\n");
     // se begone è -1 significa che non ho
     // match e in tal caso interrompo
     if(begone == -1){
       printf("no occurences");
       exit(-1);
     }
+    //printf("%ld\n", begone + begpat);
     // carico res 
-    for(unsigned int j = begone; j < p; j++){
+    for(unsigned int j = 0; j < p; j++){
       res[j] = (curr[j] == 1 && prev[j - strlen(patterns[i])] == 1) ? 1 : 0;
     }
-    
+    printf("res:\t");
+    print(res, p+1);
+    puts("\n");
   }
-
+  printf("----------------------------------------------------\ndef:\t");
+  print(res, p+1);
+  puts("\n");
   // libero la memoria
   if(npatterns != 1){
     free(curr);

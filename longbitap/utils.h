@@ -12,6 +12,11 @@
 #include <stdbool.h>
 #include "cmdline.h"
 
+#define RED "\x1b[31m"
+#define GREEN "\x1b[32m"
+#define BLUE "\x1b[34m"
+#define RESET "\x1b[0m"
+
 char* substr(const char*, int, int);
 uint64_t* bitap(char*, char*, uint64_t, uint64_t);
 uint64_t* countfirst(uint64_t*, uint64_t);

@@ -166,7 +166,7 @@ void bitapLong(char* pattern, char* text){
     for(unsigned int i = 0; i < p; i++){
       if(curr[i] == 1){
 	count++;
-	printf("occurrance starting at index %ld\n", i - (m - 1));
+	printf("occurrance starting at index: %s%ld%s\n",BLUE, i - (m - 1), RESET);
       }
     }
     free(curr);
@@ -204,7 +204,7 @@ void bitapLong(char* pattern, char* text){
       // dell'occorrenza sapendo che il pattern nel complesso è lungo m e sommo
       // 1 al counter delle occorrenze
       if(curr[patterlength - 1] == 1){
-	printf("occurrance starting at %ld\n", (currentfirst + 1) - m);
+	printf("occurrance starting at index: %s%ld%s\n",BLUE, (currentfirst + 1) - m, RESET);
 	count++;
       }
 
@@ -215,7 +215,7 @@ void bitapLong(char* pattern, char* text){
   }
 
   // stampoo il numero di occorrenze
-  printf("total number of occurences: %ld\n", count);
+  printf("total number of occurences: %s%ld%s\n",GREEN, count, RESET);
 
   // libero la memoria
   if(npatterns != 1){
@@ -241,8 +241,9 @@ char* load_file(char* path)
 
   // se non riesco ad aprire un file con quel path lo segnalo
   if (f == NULL) {
+    
     //printf("%s\n", path);
-    fprintf(stderr, "Can't open input file %s\n", path);
+    fprintf(stderr, "%sCan't open input file %s\n%s", RED, path, RESET);
     exit(1);
   }else{
     

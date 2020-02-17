@@ -166,7 +166,8 @@ void bitapLong(char* pattern, char* text){
     for(unsigned int i = 0; i < p; i++){
       if(curr[i] == 1){
 	count++;
-	printf("occurrance starting at index: %s%ld%s\n",BLUE, i - (m - 1), RESET);
+	printf("occurrance starting at index: %s%ld%s\n",
+	       BLUE, i - (m - 1), RESET);
       }
     }
     free(curr);
@@ -204,7 +205,8 @@ void bitapLong(char* pattern, char* text){
       // dell'occorrenza sapendo che il pattern nel complesso è lungo m e sommo
       // 1 al counter delle occorrenze
       if(curr[patterlength - 1] == 1){
-	printf("occurrance starting at index: %s%ld%s\n",BLUE, (currentfirst + 1) - m, RESET);
+	printf("occurrance starting at index: %s%ld%s\n",
+	       BLUE, (currentfirst + 1) - m, RESET);
 	count++;
       }
 

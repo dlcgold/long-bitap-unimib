@@ -136,7 +136,7 @@ void bitapLong(char* pattern, char* text){
 
     // carico res 
     for(unsigned int j = 0; j < p; j++){
-      res[j] = (curr[j] == 1 && prev[j - strlen(patterns[i])] == 1) ? 1 : 0;
+      res[j] = (curr[j] == 1 && prev[j - patternlength] == 1) ? 1 : 0;
     }
 
   }

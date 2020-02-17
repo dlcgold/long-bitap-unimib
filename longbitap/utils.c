@@ -98,8 +98,7 @@ void bitapLong(char* pattern, char* text){
 
   // inizializzo la grandezza massima della word
   uint64_t w = __WORDSIZE;
-  //uint64_t w = 4;
-  
+
   // conto in quanti sottopattern devo dividere il pattern per non eccedere da w
   unsigned int npatterns = ceil((double) p / w);
 
@@ -134,7 +133,7 @@ void bitapLong(char* pattern, char* text){
 
   // variabile per il conto dei match
   uint64_t count = 0;
-
+  
   // vettore in cui carico il bitap del primo sottopattern
   uint64_t* curr = bitap(patterns[0], text, patterlength, t);
 
@@ -203,7 +202,7 @@ void bitapLong(char* pattern, char* text){
       // 1 al counter delle occorrenze
       if(curr[patterlength - 1] == 1){
 	printf("occurrance starting at index: %s%ld%s\n",
-	       BLUE, (currentfirst + 1) - p, RESET);
+	       BLUE, currentfirst  - (p - 1), RESET);
 	count++;
       }
 

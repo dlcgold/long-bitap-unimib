@@ -241,6 +241,76 @@ word grandi 3 avrei $100|_2=4$ avendo quindi 1 nell'ipotetica ultima
 riga della matrice, avendo quindi un match).\\
 Il limite di queto algoritmo è hardware e consiste nella
 rappresentazione (e quindi anche nelle operazioni) su binari oltre il
-numero di bit della word.
-\section*{Long Bitap}
+numero di bit della word.\\
+Con questa soluzione si ha un tempo di $\sim O(p + t)$
+\section*{Slow Long Bitap}
+\textit{Questa è la mia implementazione più naive per superare il limite della
+  grandezza della word}.\\
+Procedo innanzitutto separando il pattern in \textit{sottopatterns}
+lunghi \texttt{w}, tranne l'ultimo, che sarà lungo $\mathtt{p} -
+\mathtt{w}$. Spezzo quindi il pattern in un numero di sottopatterns
+pari a $\lceil \frac{\mathtt{p}}{\mathtt{w}}\rceil$. Questi patterns
+vengono caricati in un array di stringhe.\\
+Per effettuare il match si sfruttano 3 array di lunghezza
+\texttt{t}. Si ha un array contenenete l'ultima riga teorica prodotta
+dall'algoritmo \texttt{bitap}, uno contenente quello precedente e uno
+risultante. Si procede a coppie verificando che l'array dell'ultimo
+bitap presenti 1 esattamente ad una distanza pari alla lunghezza del
+sottopattern in analisi rispetto ad un 1 nell'array prodotto
+dall'algoritmo \texttt{bitap} sul sottopattern precedente. Nel caso si
+abbia questa corrispondenza tra i due array si carica 1 nel terzo array (quello
+risultante) in corrispondenza dell'indice in cui c'era 1 nell'array
+prodotto per il sottopattern corrente, altrimenti si carica 0. Alla
+sucessiva iterazione l'array risultante diventerà quello precedente
+fino ad esaurimento dei sottopatterns. A questo punto avrò un array
+risultante con gli indici che rappresentano la fine di un match di
+\texttt{P} in \texttt{T}. Per ottenere le posizioni di inizio basta
+sottrarre a tali valori $\mathtt{p} - 1$ (il $-1$ è causato
+dall'inizio all'indice 0 e non 1).
+\newpage
+\begin{esempio}
+  Vediamo un esempio semplificato ipotizzando una cpu con
+  $WORDSIZE=2$.\\
+  Sia $\mathtt{T}=abbaccabbacabcabbacc$ e $\mathtt{P}=abbac$.\\
+  Si avrà quindi il seguente array dei sottopatterns:
+  \[\mathtt{patterns}=\{"ab", "ba", "c"\}\]
+  Per semplicità rappresentiamo la tabella complessiva dei tre
+  \texttt{bitap} senza rappresentare i vari step intermedi. Si
+  otterrebbe quindi la matrice dei 3 bitap (dove vengono sottolineate
+  le occorrenze di uno valide secondo la logica sopra descritta):
+  \begin{center}
+    \begin{table}[H]
+      \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+        \hline
+        & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 &
+                                                                      14
+        & 15 & 16 & 17 & 18 & 19 \\ \hline
+        & a & b & b & a & c & c & a & b & b & a & c & a & b & c & a &
+                                                                      b
+             & b & a & c & c \\ \hline\hline  
+        \textit{ab} & 0 & \underline{1} & 0 & 0 & 0 & 0 & 0 & 1 & 0 &
+                                                                      0
+                                                & 0 & 0 & 1 & 0 & 0 &
+                                                                  \underline{1} 
+             & 0 & 0 & 0 & 0 \\ \hline   
+        \textit{ba} & 0 & 0 & 0 & \underline{1} & 0 & 0 & 0 & 0 & 0 &
+                                                                      1
+                                                & 0 & 0 & 0 & 0 & 0 &
+                                                                      0
+             & 0 & \underline{1} & 0 & 0 \\ \hline   
+        \textit{c} & 0 & 0 & 0 & 0 & \underline{1} & 1 & 0 & 0 & 0 & 0
+                                                & 1 & 0 & 0 & 1 & 0 &
+                                                                      0
+             & 0 & 0 & \underline{1} & 1 \\ \hline   
+      \end{tabular}
+    \end{table}
+  \end{center}
+  Si ha quindi un match terminante all'indice 4 (quindi iniziante all'indice
+  0) e uno all'indice 18 (quindi iniante all'indice 14) 
+\end{esempio}
+Visto che viene effettuata una chiamata a \texttt{bitap} per ogni
+sottopattern si ha un tempo pari a $\sim O\left(\lceil
+  \frac{\mathtt{p}}{\mathtt{w}}\rceil\cdot (p + t)\right)$.\\
+Si notano quindi le problematiche che posso nascere all'aumentare
+della grandezza del testo e a quella del pattern,
 \end{document}

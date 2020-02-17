@@ -141,9 +141,6 @@ void bitapLong(char* pattern, char* text){
   // vettore in cui carico il bitap del primo sottopattern
   uint64_t* curr = bitap(patterns[0], text, patterlength, p);
 
-  // stringa con la finestra di text da analizzare
-  char* window;
-
   // array con gli indici di fine match 
   uint64_t* firsts = countfirst(curr, p);
 
@@ -172,6 +169,10 @@ void bitapLong(char* pattern, char* text){
     }
     free(curr);
   }else{
+    
+    // stringa con la finestra di text da analizzare
+    char* window;
+    
     // fino a che ho match col primo sottopattern itero
     while(currentfirst){
       // itero per ogni sottopattern
@@ -200,7 +201,6 @@ void bitapLong(char* pattern, char* text){
 	// itero nuovamente
 	currentfirst += patterlength;
       }
-      
       // se alla fine ho un 1 alla fine dell'ultimo bitap stampo l'inizio
       // dell'occorrenza sapendo che il pattern nel complesso è lungo m e sommo
       // 1 al counter delle occorrenze
@@ -222,7 +222,6 @@ void bitapLong(char* pattern, char* text){
   // libero la memoria
   if(npatterns != 1){
     free(curr);
-    free(window);
   }
   free(firsts);
   for(unsigned int i = 0; i < npatterns; i++)
@@ -266,8 +265,14 @@ char* load_file(char* path)
     // se effettivamente il file contiene qualcosa (e quindi ho allocato buffer)
     // con una certa lunghezza uso fread per leggere il file e caricare la
     // stringa
+    int r;
     if (buffer){
-      fread(buffer, sizeof(char), length, f);
+      r = fread(buffer, sizeof(char), length, f);
+      if(r == -1){
+	fprintf(stderr, "%sunexpected error %s\n%s", RED, path, RESET);
+	exit(1);
+      }
+	
     }
 
     // chiudo il file

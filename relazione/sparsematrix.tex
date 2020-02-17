@@ -84,7 +84,7 @@
 \section*{Bitap}
 \textit{Nell'analisi un bit rappresentato in colonna presenta il bit
   più significativo, \textit{MSB}, in basso}\\
-Innazitutto si descrive l'algoritmo di base, funzionante per pattern
+Innanzitutto si descrive l'algoritmo di base, funzionante per pattern
 lunghi al massimo quanto una \textit{word}, \texttt{w} della cpu.\\
 Si hanno in input un \textit{pattern} \texttt{P} di lunghezza \texttt{p} e un
 \textit{testo} \texttt{T} di lunghezza \texttt{t}. Si ha quindi \texttt{p <= w}.\\
@@ -117,7 +117,7 @@ In termini pratici questo algoritmo può essere costruito mediante
 operazioni \textbf{bit a bit} in quanto le singole colonne della
 matrice teorica possono essere viste come numeri in rappresentazione
 binaria.\\
-Per procedere si ha una fase di preprocessamento in cui si costruice
+Per procedere si ha una fase di preprocessamento in cui si costruisce
 un array \texttt{U}, di lunghezza pari a quella dell'alfabeto in uso,
 che contiene in posizione \texttt{k} il binario rappresentante le
 occorrenze del carattere \texttt{k} nel pattern. Nel pattern il
@@ -224,35 +224,38 @@ tutto il pattern ottengo il vettore \texttt{U} correttamente caricato.
   \]
   Alla fine quindi $U[\mathtt{c}]=1001|_2=9$ e $U[\mathtt{a}]=0110|_2=6$
 \end{esempio}
-L'algortimo prosegue inizializzando la prima colonna a 1 se testo e
-pattern condividono il primo cararattere, 0 altrimenti.\\
+L'algoritmo prosegue inizializzando la prima colonna a 1 se testo e
+pattern condividono il primo carattere, 0 altrimenti.\\
 Si procede poi col calcolo delle colonne successive alla prima
 sfruttando la colonna precedente. Si procede con un
 \textit{left-shift} del valore rappresentante la colonna precedente
 con l'aggiunta di un 1 in testa. Si procede poi con l'\texttt{and} tra
 il risultato appena ottenuto e il valore di \texttt{U} nella posizione
 del carattere che sto considerando. Si controlla infine ogni valore
-rappreentante una colonna vedendo se presenta 1 nell'ultimo bit. Per
+rappresentante una colonna vedendo se presenta 1 nell'ultimo bit. Per
 ottenere questo risultato si procede con il \textit{left-shift} di uno
 di un'unità pari alla lunghezza del pattern meno uno e
-all'\texttt{and} con il valore rappresentante la colonna. Mi verra
+all'\texttt{and} con il valore rappresentante la colonna. Mi verrà
 infatti restituito un binario avente valore o 0 o $2^{p-1}$ (nel caso di
 word grandi 3 avrei $100|_2=4$ avendo quindi 1 nell'ipotetica ultima
-riga della matrice, avendo quindi un match).\\
+riga della matrice, avendo quindi un match, infatti viene fatto un
+\texttt{and} con un valore che in codifica binaria presenta tutti 0
+tranne il \textit{MSB} che presenta 1).\\
 Il limite di queto algoritmo è hardware e consiste nella
 rappresentazione (e quindi anche nelle operazioni) su binari oltre il
 numero di bit della word.\\
-Con questa soluzione si ha un tempo di $\sim O(p + t)$
+Con questa soluzione si ha un tempo di:
+\[\sim O(p + t)\]
 \section*{Slow Long Bitap}
 \textit{Questa è la mia implementazione più naive per superare il limite della
   grandezza della word}.\\
 Procedo innanzitutto separando il pattern in \textit{sottopatterns}
 lunghi \texttt{w}, tranne l'ultimo, che sarà lungo $\mathtt{p} -
 \mathtt{w}$. Spezzo quindi il pattern in un numero di sottopatterns
-pari a $\lceil \frac{\mathtt{p}}{\mathtt{w}}\rceil$. Questi patterns
+pari a $\big\lceil \frac{\mathtt{p}}{\mathtt{w}}\big\rceil$. Questi patterns
 vengono caricati in un array di stringhe.\\
 Per effettuare il match si sfruttano 3 array di lunghezza
-\texttt{t}. Si ha un array contenenete l'ultima riga teorica prodotta
+\texttt{t}. Si ha un array contenente l'ultima riga teorica prodotta
 dall'algoritmo \texttt{bitap}, uno contenente quello precedente e uno
 risultante. Si procede a coppie verificando che l'array dell'ultimo
 bitap presenti 1 esattamente ad una distanza pari alla lunghezza del
@@ -261,13 +264,12 @@ dall'algoritmo \texttt{bitap} sul sottopattern precedente. Nel caso si
 abbia questa corrispondenza tra i due array si carica 1 nel terzo array (quello
 risultante) in corrispondenza dell'indice in cui c'era 1 nell'array
 prodotto per il sottopattern corrente, altrimenti si carica 0. Alla
-sucessiva iterazione l'array risultante diventerà quello precedente
+successiva iterazione l'array risultante diventerà quello precedente
 fino ad esaurimento dei sottopatterns. A questo punto avrò un array
 risultante con gli indici che rappresentano la fine di un match di
 \texttt{P} in \texttt{T}. Per ottenere le posizioni di inizio basta
 sottrarre a tali valori $\mathtt{p} - 1$ (il $-1$ è causato
 dall'inizio all'indice 0 e non 1).
-\newpage
 \begin{esempio}
   Vediamo un esempio semplificato ipotizzando una cpu con
   $WORDSIZE=2$.\\
@@ -275,42 +277,174 @@ dall'inizio all'indice 0 e non 1).
   Si avrà quindi il seguente array dei sottopatterns:
   \[\mathtt{patterns}=\{"ab", "ba", "c"\}\]
   Per semplicità rappresentiamo la tabella complessiva dei tre
-  \texttt{bitap} senza rappresentare i vari step intermedi. Si
+  \texttt{bitap} senza rappresentare i vari steps intermedi. Si
   otterrebbe quindi la matrice dei 3 bitap (dove vengono sottolineate
   le occorrenze di uno valide secondo la logica sopra descritta):
   \begin{center}
     \begin{table}[H]
       \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
-        \hline
+        \toprule
         & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 &
                                                                       14
         & 15 & 16 & 17 & 18 & 19 \\ \hline
         & a & b & b & a & c & c & a & b & b & a & c & a & b & c & a &
                                                                       b
              & b & a & c & c \\ \hline\hline  
-        \textit{ab} & 0 & \underline{1} & 0 & 0 & 0 & 0 & 0 & 1 & 0 &
+        \textit{ab} & 0 & \underline{1} & 0 & 0 & 0 & 0 & 0 &
+                                                              \underline{1}
+                                        & 0
+                                            & 
                                                                       0
                                                 & 0 & 0 & 1 & 0 & 0 &
                                                                   \underline{1} 
              & 0 & 0 & 0 & 0 \\ \hline   
         \textit{ba} & 0 & 0 & 0 & \underline{1} & 0 & 0 & 0 & 0 & 0 &
-                                                                      1
+                                                                    \underline{1}
+                                                                      
                                                 & 0 & 0 & 0 & 0 & 0 &
                                                                       0
              & 0 & \underline{1} & 0 & 0 \\ \hline   
         \textit{c} & 0 & 0 & 0 & 0 & \underline{1} & 1 & 0 & 0 & 0 & 0
-                                                & 1 & 0 & 0 & 1 & 0 &
+                                                & \underline{1} & 0 &
+                                                                      0 & 1 & 0 & 
                                                                       0
-             & 0 & 0 & \underline{1} & 1 \\ \hline   
+             & 0 & 0 & \underline{1} & 1 \\ \bottomrule   
       \end{tabular}
     \end{table}
   \end{center}
   Si ha quindi un match terminante all'indice 4 (quindi iniziante all'indice
-  0) e uno all'indice 18 (quindi iniante all'indice 14) 
-\end{esempio}
+  0), uno all'indice 10 (quindi iniziante all'indice 6)
+  e uno all'indice 18 (quindi iniziante all'indice 14).
+\end{esempio}.
+\\
 Visto che viene effettuata una chiamata a \texttt{bitap} per ogni
-sottopattern si ha un tempo pari a $\sim O\left(\lceil
-  \frac{\mathtt{p}}{\mathtt{w}}\rceil\cdot (p + t)\right)$.\\
+sottopattern si ha un tempo pari a (ipotizzando un tempo $O(m)$, con
+$m\sim t$, per la \texttt{memcpy}):
+\[\sim O\left(\Big\lceil
+  \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot (m + w + 2\cdot
+  t)\right)\to\,\sim 
+O\left(\Big\lceil \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot (m + w
+  + t)\right)\] 
 Si notano quindi le problematiche che posso nascere all'aumentare
-della grandezza del testo e a quella del pattern,
+della grandezza del testo e a quella del pattern.\\
+Il problema grave di questa implementazione è che vengono effettuate
+troppe operazioni inutili a priori chiamando bitap su tutto il testo
+per tutti i sottopattern.\\
+In termini pratici (ma meno oggettivi) sulla mia macchina
+(\textit{Intel i7 8550U} con $8$gb di ram) per un pattern di $3374$
+caratteri su un testo lungo $3391270$ si ha un tempo di circa $2.2$
+secondi per trovare le $60$ occorrenze.
+\newpage
+\section*{Fast Long Bitap}
+Il ragionamento di base è lo stesso della precedente implementazione e
+si procede spezzando il pattern in maniera analoga. La differenza
+sostanziale si ritrova nella finestra di testo su cui viene chiamata
+la funzione \texttt{bitap} e il numero di volte in cui essa viene
+chiamata.\\
+Innanzitutto viene chiamata la funzione \texttt{bitap} sul primo
+sottopattern (qualora si abbia un solo sottopattern si è nella
+situazione in cui $\mathtt{p}<=\mathtt{w}$ e quindi si stampano
+direttamente le occorrenze). Si chiama anche una funzione
+\texttt{countfirst} che, preso in ingresso un array, restituisce un
+secondo array contenente gli indici dove si ha un 1. Chiamando questa
+funzione sull'array restituito dalla funzione \texttt{bitap}, chiamata
+sul primo sottopattern, calcolo gli indici in cui termina un match del
+primo sottopattern nel testo. Questo passaggio è \textbf{fondamentale}
+per ridurre il numero di operazioni inutili in quanto a priori gli
+eventuali match dell'intero pattern avranno come indice di partenza
+gli indici ricavabili come sopra a partire da questi ultimi.\\
+Procedendo col ragionamento si ha che si può ricercare il secondo
+sottopattern solo nella finestra di testo, che parte con l'indice di
+fine match del primo sottopattern, di lunghezza pari a questo secondo
+sottopattern. A questo punto chiamo quindi \texttt{bitap} su questa
+piccola finestra di testo e ne valuto solo l'ultimo elemento. Si hanno
+quindi 3 casi:
+\begin{enumerate}
+  \item l'ultimo elemento è 1 e ho un altro sottopattern da
+  analizzare. Proseguo quindi iterativamente fino ad esaurimento dei
+  sottopatterns
+  \item l'ultimo elemento è 1 e non ho un altro sottopattern da
+  analizzare. In tal caso ho analizzato l'intero pattern e nell'ultimo
+  indice raggiunto termina un match del pattern sul testo, che viene
+  stampato. A questo punto vedo se esiste un ulteriore valore
+  nell'array contenente gli indice di fine match del primo
+  sottopattern. Se esiste ricomincio da capo a partire da quell'indice
+  altrimenti termino l'esecuzione in quanto ho concluso l'analisi
+  \item l'ultimo elemento è 0. In tal caso a priori smetto di cercare
+  un pattern iniziante da un dato valore dell'array contenente gli
+  indice di fine match del primo sottopattern ed eventualmente mi
+  sposto al valore successivo ricominciando da capo la ricerca a
+  partire dal nuovo indice. Qualora tale valore non esista  termino
+  l'esecuzione in quanto ho concluso l'analisi 
+\end{enumerate}
+Si nota che le chiamate a \texttt{bitap} vengono effettuate su un
+pattern e un testo di uguale lunghezza.
+\begin{esempio}
+  Vediamo un esempio semplificato ipotizzando una cpu con
+  $WORDSIZE=2$.\\
+  Sia $\mathtt{T}=abbaccabbacabcabbacc$ e $\mathtt{P}=abbac$.\\
+  Si avrà quindi il seguente array dei sottopatterns:
+  \[\mathtt{patterns}=\{"ab", "ba", "c"\}\]
+  Chiamo \texttt{bitap} sul primo sottopattern, ovvero
+  ``\textit{ab}'':
+  \begin{center}
+    \begin{table}[H]
+      \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+        & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 &
+                                                                      14
+        & 15 & 16 & 17 & 18 & 19 \\ \hline
+        & a & b & b & a & c & c & a & b & b & a & c & a & b & c & a & b &
+                                                                        b
+             & a & c & c \\ \hline  
+        \textit{ab} & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 &
+                                                                        0
+             & 0 & 0 & 0 \\ \bottomrule
+      \end{tabular}
+    \end{table}
+  \end{center}
+  l'array calcolato con \texttt{countfirst} conterrà i valori:
+  \[\{1,7,12,15\}\]
+  Parto quindi dall'indice 1. Chiamo bitap sul secondo sottopattern,
+  ``\textit{ab}'', lungo 2, nella porzione di testo tra 2 e
+  3 (inclusi). La chiamata \texttt{bitap} di ``\textit{ba}'' su ``\textit{ba}''
+  restituisce $\{0,1\}$. Avendo 1 in ultima porzione posso proseguire.
+  Chiamo \texttt{bitap} il terzo sottopattern, ``\textit{c}'', lungo
+  1, sulla finestra di testo che parte da 4 e termina in 4 (inclusi). Ovviamente
+  essendo ``\textit{c}'' uguale a ``\textit{c}'' ottengo l'array con
+  solo un elemento: $\{1\}$. Avendo finito i sottopattern e avendo 1
+  alla fine so che ho un match terminante in posizione 4 (e quindi
+  iniziante in posizione 0). \\Mi sposto quindi sul secondo indice di
+  match del primo sottopattern: 7. Procedendo come sopra scopro che
+  anche in questo caso ho un match, terminante all'indice 10 (e quindi
+  che inizia all'indice 6). \\Valuto quindi 12.  Chiamo bitap sul
+  secondo sottopattern, ``\textit{ab}'', lungo 2, nella porzione di
+  testo tra 2 e 3 (inclusi). La chiamata \texttt{bitap} di
+  ``\textit{ba}'' su ``\textit{ca}''  restituisce $\{0,0\}$. Smetto
+  quindi di analizzare altro e passo a valutare 15. Anche in questo
+  caso si avrà un match, terminante in 18 e iniziante in 14.\\
+  Ho quindi trovato gli indici di partenza dei 3 match:
+  \[\{0,6,14\}\]
+\end{esempio}
+Diamo ora una stima approssimata dei tempi. Chiamo $k$ il numero di
+occorrenze del primo pattern nel testo. Sapendo che il costo del
+calcolo di una sottostringa ha un costo pari alla lunghezza della
+sottostringa (e sapendo che in generale queste saranno lunghe
+\texttt{w}) si ha che ogni chiamata alla funzione che calcola la
+sottostringa costa $\sim O(\mathtt{w})$. Come detto la funzione
+\texttt{bitap} viene chiamata su un testo lungo quanto il sottopattern
+(che sappiamo essere lungo al più \texttt{w}), 
+quindi il suo costo è $\sim O(2\cdot w)\to\sim O(w)$. Quindi il costo
+dell'analisi è di:
+\[\sim O(k\cdot \Big\lceil
+  \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot (2w))
+  \to\sim O(k\cdot \Big\lceil
+  \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot w)
+\to \sim O(k\cdot p+k\cdot w)\]
+a questa stima vanno sommati i costi della prima chiamata a
+\texttt{bitap}, ovvero $\sim O(w + t)$ e del calcolo deglin indici di
+partenza, ovvero $\sim O(t)$.\\
+In termini pratici (ma meno oggettivi) sulla mia macchina
+(\textit{Intel i7 8550U} con $8$gb di ram) per un pattern di $3374$
+caratteri su un testo lungo $3391270$ si ha un tempo inferiore a $0.1$
+secondi per trovare le $60$ occorrenze.
 \end{document}

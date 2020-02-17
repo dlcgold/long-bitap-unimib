@@ -181,7 +181,7 @@ void bitapLong(char* pattern, char* text){
 	// calcolo la finestra di analisi ovvero la sottostringa di text che
 	// parte dall'indice del match precedente ed è lunga quanto il
 	// sottopattern in analisi
-	window = substr(text, currentfirst + 1,
+	window = substr(text, currentfirst + 1 ,
 			currentfirst + patterlength + 1);
 	
 	// chiamo bitap col sottopattern in analisi su quella finestra

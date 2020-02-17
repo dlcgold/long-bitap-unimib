@@ -3,7 +3,7 @@ SOURCE	= main.c utils.c cmdline.c
 HEADER	= utils.h cmdline.h
 OUT	= bitaplong.out
 CC	 = gcc
-FLAGS	 = -g -c -Wall -Wextra 
+FLAGS	 = -g -c -Wall -Wextra -O2 
 LFLAGS	 = -lm
 
 all: $(OBJS)

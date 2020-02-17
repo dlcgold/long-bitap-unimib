@@ -33,23 +33,6 @@
 \usepackage{pgfplots}
 \usepackage[cache=false]{minted}
 
-\usepackage[usenames,dvipsnames]{pstricks}
-\usepackage{epsfig}
-\usepackage{pst-grad} % For gradients
-\usepackage{pst-plot} % For axes
-\usepackage[space]{grffile} % For spaces in paths
-\usepackage{etoolbox} % For spaces in paths
-\makeatletter % For spaces in paths
-\patchcmd\Gread@eps{\@inputcheck#1 }{\@inputcheck"#1"\relax}{}{}
-\makeatother
-
-\usepackage{tikz}\usetikzlibrary{er}\tikzset{multi  attribute /.style={attribute ,double  distance =1.5pt}}\tikzset{derived  attribute /.style={attribute ,dashed}}\tikzset{total /.style={double  distance =1.5pt}}\tikzset{every  entity /.style={draw=orange , fill=orange!20}}\tikzset{every  attribute /.style={draw=MediumPurple1, fill=MediumPurple1!20}}\tikzset{every  relationship /.style={draw=Chartreuse2, fill=Chartreuse2!20}}\newcommand{\key}[1]{\underline{#1}}
-
-%\usepackage{fancyhdr}
-
-\usepackage{tikz}
-\usetikzlibrary{automata,positioning}
-
 
 \title{Relazione Progetto\\
   Elementi di Bioinformatica\\
@@ -281,36 +264,35 @@ dall'inizio all'indice 0 e non 1).
   otterrebbe quindi la matrice dei 3 bitap (dove vengono sottolineate
   le occorrenze di uno valide secondo la logica sopra descritta):
   \begin{center}
-    \begin{table}[H]
-      \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
-        \toprule
-        & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 &
-                                                                      14
-        & 15 & 16 & 17 & 18 & 19 \\ \hline
-        & a & b & b & a & c & c & a & b & b & a & c & a & b & c & a &
-                                                                      b
-             & b & a & c & c \\ \hline\hline  
-        \textit{ab} & 0 & \underline{1} & 0 & 0 & 0 & 0 & 0 &
-                                                              \underline{1}
-                                        & 0
-                                            & 
-                                                                      0
-                                                & 0 & 0 & 1 & 0 & 0 &
-                                                                  \underline{1} 
-             & 0 & 0 & 0 & 0 \\ \hline   
-        \textit{ba} & 0 & 0 & 0 & \underline{1} & 0 & 0 & 0 & 0 & 0 &
+    \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+      \hline
+      & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 &
+                                                                    14
+      & 15 & 16 & 17 & 18 & 19 \\ \hline
+      & a & b & b & a & c & c & a & b & b & a & c & a & b & c & a &
+                                                                    b
+           & b & a & c & c \\ \hline\hline  
+      \textit{ab} & 0 & \underline{1} & 0 & 0 & 0 & 0 & 0 &
+                                                            \underline{1}
+                                      & 0
+                                          & 
+                                            0
+                                              & 0 & 0 & 1 & 0 & 0 &
+                                                                    \underline{1} 
+           & 0 & 0 & 0 & 0 \\ \hline   
+      \textit{ba} & 0 & 0 & 0 & \underline{1} & 0 & 0 & 0 & 0 & 0 &
                                                                     \underline{1}
-                                                                      
-                                                & 0 & 0 & 0 & 0 & 0 &
-                                                                      0
-             & 0 & \underline{1} & 0 & 0 \\ \hline   
-        \textit{c} & 0 & 0 & 0 & 0 & \underline{1} & 1 & 0 & 0 & 0 & 0
-                                                & \underline{1} & 0 &
-                                                                      0 & 1 & 0 & 
-                                                                      0
-             & 0 & 0 & \underline{1} & 1 \\ \bottomrule   
-      \end{tabular}
-    \end{table}
+                                                                    
+                                              & 0 & 0 & 0 & 0 & 0 &
+                                                                    0
+           & 0 & \underline{1} & 0 & 0 \\ \hline   
+      \textit{c} & 0 & 0 & 0 & 0 & \underline{1} & 1 & 0 & 0 & 0 & 0
+                                              & \underline{1} & 0 &
+                                                                    0 & 1 & 0 & 
+                                                                                0
+           & 0 & 0 & \underline{1} & 1 \\ \hline
+    \end{tabular}
+
   \end{center}
   Si ha quindi un match terminante all'indice 4 (quindi iniziante all'indice
   0), uno all'indice 10 (quindi iniziante all'indice 6)
@@ -321,10 +303,10 @@ Visto che viene effettuata una chiamata a \texttt{bitap} per ogni
 sottopattern si ha un tempo pari a (ipotizzando un tempo $O(m)$, con
 $m\sim t$, per la \texttt{memcpy}):
 \[\sim O\left(\Big\lceil
-  \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot (m + w + 2\cdot
-  t)\right)\to\,\sim 
-O\left(\Big\lceil \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot (m + w
-  + t)\right)\] 
+    \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot (m + w + 2\cdot
+    t)\right)\to\,\sim 
+  O\left(\Big\lceil \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot (m + w
+    + t)\right)\] 
 Si notano quindi le problematiche che posso nascere all'aumentare
 della grandezza del testo e a quella del pattern.\\
 Il problema grave di questa implementazione è che vengono effettuate
@@ -388,19 +370,18 @@ pattern e un testo di uguale lunghezza.
   Chiamo \texttt{bitap} sul primo sottopattern, ovvero
   ``\textit{ab}'':
   \begin{center}
-    \begin{table}[H]
-      \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
-        & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 &
-                                                                      14
-        & 15 & 16 & 17 & 18 & 19 \\ \hline
-        & a & b & b & a & c & c & a & b & b & a & c & a & b & c & a & b &
+    \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+      \hline
+      & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 &
+                                                                    14
+      & 15 & 16 & 17 & 18 & 19 \\ \hline
+      & a & b & b & a & c & c & a & b & b & a & c & a & b & c & a & b &
                                                                         b
-             & a & c & c \\ \hline  
-        \textit{ab} & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 &
-                                                                        0
-             & 0 & 0 & 0 \\ \bottomrule
-      \end{tabular}
-    \end{table}
+                & a & c & c \\ \hline  
+      \textit{ab} & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 &
+                                                                                    0
+                & 0 & 0 & 0 \\ \hline
+    \end{tabular}
   \end{center}
   l'array calcolato con \texttt{countfirst} conterrà i valori:
   \[\{1,7,12,15\}\]
@@ -434,17 +415,61 @@ sottostringa costa $\sim O(\mathtt{w})$. Come detto la funzione
 \texttt{bitap} viene chiamata su un testo lungo quanto il sottopattern
 (che sappiamo essere lungo al più \texttt{w}), 
 quindi il suo costo è $\sim O(2\cdot w)\to\sim O(w)$. Quindi il costo
-dell'analisi è di:
-\[\sim O(k\cdot \Big\lceil
-  \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot (2w))
-  \to\sim O(k\cdot \Big\lceil
-  \frac{\mathtt{p}}{\mathtt{w}}\Big\rceil\cdot w)
-\to \sim O(k\cdot p+k\cdot w)\]
+dell'algortimo è di (imponendo che $n$ rappresenta il numero di
+sottopatterns, ovvero $n=\big\lceil
+  \frac{\mathtt{p}}{\mathtt{w}}\big\rceil$):
+\[\sim O(k\cdot n\cdot (2w))
+  \to\sim O(k\cdot n\cdot w)
+\]
 a questa stima vanno sommati i costi della prima chiamata a
 \texttt{bitap}, ovvero $\sim O(w + t)$ e del calcolo deglin indici di
-partenza, ovvero $\sim O(t)$.\\
+partenza, ovvero $\sim O(t)$. Si nota come non si abbia più \texttt{t}
+moltiplicato per il numero di sottopatterns (fattore che rallentava
+l'algoritmo in presenza di testi molto lunghi).
+\newpage
+\section*{Tabella Test}
 In termini pratici (ma meno oggettivi) sulla mia macchina
-(\textit{Intel i7 8550U} con $8$gb di ram) per un pattern di $3374$
-caratteri su un testo lungo $3391270$ si ha un tempo inferiore a $0.1$
-secondi per trovare le $60$ occorrenze.
+(\textit{Intel i7 8550U} con $8$gb di ram) sono stati effettuati 4
+test:
+\begin{enumerate}
+  \item \textbf{short}: un breve pattern (di grandezza minore a word)
+  su un breve testo:
+  \begin{itemize}
+    \item lunghezza pattern: $7$
+    \item lunghezza testo: $26$
+    \item numero di occorrenze: $2$
+  \end{itemize}
+  \item \textbf{word}: un breve pattern lungo quanto una word su un
+  testo non breve:
+  \begin{itemize}
+    \item lunghezza pattern: $64$
+    \item lunghezza testo: $74640$
+    \item numero di occorrenze: $289$
+  \end{itemize}
+  \item \textbf{medium}: un pattern lungo circa il triplo di una word
+  su un testo non breve:
+  \begin{itemize}
+    \item lunghezza pattern: $151$
+    \item lunghezza testo: $37287$
+    \item numero di occorrenze: $170$
+  \end{itemize}
+  \item \textbf{long}: un pattern lungo su un testo molto lungo:
+  \begin{itemize}
+    \item lunghezza pattern: $3374$
+    \item lunghezza testo: $3391270$
+    \item numero di occorrenze: $60$
+  \end{itemize}
+\end{enumerate}
+Vediamo quindi una tabella riassuntiva coi tempi calcolati da \texttt{time}:
+\begin{center}
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    & short        & word         & medium       & long        \\ \hline\hline
+    slow & $\sim 0.001s$ & $\sim 0.004s$ & $\sim 0.005s$ & $\sim 1.6s$  \\ \hline
+    fast & $\sim 0.001s$ & $\sim 0.004s$ & $\sim 0.004s$ & $\sim 0.06s$ \\ \hline
+  \end{tabular}
+\end{center}
+\textbf{Questi dati non sono universalmente utili ma sono
+  identificativi del miglioramento delle performance in presenza di
+  pattern e testo lunghi}
 \end{document}

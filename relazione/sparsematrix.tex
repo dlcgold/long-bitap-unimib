@@ -1,0 +1,246 @@
+\documentclass[a4paper,12pt, oneside]{article}
+% \usepackage{fullpage}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{amstext}
+\usepackage{engrec}
+\usepackage{rotating}
+\usepackage[safe,extra]{tipa}
+\usepackage{showkeys}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{sectsty}
+\usepackage{mathtools}
+\usepackage{microtype}
+\usepackage{enumerate}
+\usepackage{braket}
+\usepackage{marginnote}
+\usepackage{pgfplots}
+\usepackage{cancel}
+\usepackage{polynom}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{framed}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pdfpages}
+\usepackage{pgfplots}
+\usepackage[cache=false]{minted}
+
+\usepackage[usenames,dvipsnames]{pstricks}
+\usepackage{epsfig}
+\usepackage{pst-grad} % For gradients
+\usepackage{pst-plot} % For axes
+\usepackage[space]{grffile} % For spaces in paths
+\usepackage{etoolbox} % For spaces in paths
+\makeatletter % For spaces in paths
+\patchcmd\Gread@eps{\@inputcheck#1 }{\@inputcheck"#1"\relax}{}{}
+\makeatother
+
+\usepackage{tikz}\usetikzlibrary{er}\tikzset{multi  attribute /.style={attribute ,double  distance =1.5pt}}\tikzset{derived  attribute /.style={attribute ,dashed}}\tikzset{total /.style={double  distance =1.5pt}}\tikzset{every  entity /.style={draw=orange , fill=orange!20}}\tikzset{every  attribute /.style={draw=MediumPurple1, fill=MediumPurple1!20}}\tikzset{every  relationship /.style={draw=Chartreuse2, fill=Chartreuse2!20}}\newcommand{\key}[1]{\underline{#1}}
+
+%\usepackage{fancyhdr}
+
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning}
+
+
+\title{Relazione Progetto\\
+  Elementi di Bioinformatica\\
+  \large Long Bitap}
+
+\author{Davide Cozzi\\
+  829827\\
+  \href{mailto:d.cozzi@campus.unimib.it}{d.cozzi@campus.unimib.it}}
+\date{}
+
+\pgfplotsset{compat=1.13}
+\begin{document}
+\maketitle
+
+\definecolor{shadecolor}{gray}{0.80}
+\setlist{leftmargin = 2cm}
+\newtheorem{teorema}{Teorema}
+\newtheorem{definizione}{Definizione}
+\newtheorem{esempio}{Esempio}
+\newtheorem{corollario}{Corollario}
+\newtheorem{lemma}{Lemma}
+\newtheorem{osservazione}{Osservazione}
+\newtheorem{nota}{Nota}
+\newtheorem{esercizio}{Esercizio}
+
+\renewcommand{\chaptermark}[1]{%
+  \markboth{\chaptername
+    \ \thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+\allsectionsfont{\centering}
+
+\section*{Bitap}
+\textit{Nell'analisi un bit rappresentato in colonna presenta il bit
+  più significativo, \textit{MSB}, in basso}\\
+Innazitutto si descrive l'algoritmo di base, funzionante per pattern
+lunghi al massimo quanto una \textit{word}, \texttt{w} della cpu.\\
+Si hanno in input un \textit{pattern} \texttt{P} di lunghezza \texttt{p} e un
+\textit{testo} \texttt{T} di lunghezza \texttt{t}. Si ha quindi \texttt{p <= w}.\\
+A livello teorico si costruisce una \textbf{matrice booleana}
+\texttt{D}, di dimensioni $\mathtt{p}\times \mathtt{t}$, e si stabiliscono due indici:
+\begin{enumerate}
+  \item \texttt{i} che itera sul pattern
+  \item \texttt{j} che itera sul testo
+\end{enumerate}
+Si ha che la generica posizione di indici \texttt{i}, \texttt{j} nella
+matrice è $1$ sse i primi \texttt{i} caratteri del pattern matchano un
+numero \texttt{i} di caratteri del testo terminanti all'indice
+\texttt{j}.\\
+Si ha quindi la seguente \textbf{equazione di ricorrenza}:
+\[D[i,j]=
+  \begin{cases}
+    1 & \mbox{sse } \mathtt{P}[1..\mathtt{i}] =
+    \mathtt{T}[\mathtt{j}-\mathtt{i}+1..\mathtt{j}] \\
+    0 & \mbox{altrimenti}
+  \end{cases}
+\]
+Nell'\texttt{i}-sima riga si ha che le occorrenze di 1 indicano i
+punti nel testo dove termina una copia di
+$\mathtt{P}[1..\mathtt{i}]$.\\
+Invece la \texttt{j}-sima colonna mostra tutti i prefissi del testo
+che finiscono nella posizione \texttt{j} del testo.\\
+Nell'ultima riga della matrice si ha la soluzione, ovvero si ha 1 dove
+termina un match del pattern nel testo.\\
+In termini pratici questo algoritmo può essere costruito mediante
+operazioni \textbf{bit a bit} in quanto le singole colonne della
+matrice teorica possono essere viste come numeri in rappresentazione
+binaria.\\
+Per procedere si ha una fase di preprocessamento in cui si costruice
+un array \texttt{U}, di lunghezza pari a quella dell'alfabeto in uso,
+che contiene in posizione \texttt{k} il binario rappresentante le
+occorrenze del carattere \texttt{k} nel pattern. Nel pattern il
+vettore \texttt{U} viene definito di lunghezza \texttt{CHAR\_MAX},
+ovvero $127$, per usare la tabella ASCII a 7 bit. Per costruire tale
+array si procede inizializzando tutte le celle a 0. Si itera poi lungo
+il pattern aggiornando \texttt{U} nella posizione del carattere preso
+in considerazione del pattern facendo l'\texttt{or} tra l'attuale
+contenuto di \texttt{U} in quella posizione e il numero la cui
+rappresentazione binaria presenta 1 solo nella posizione di indice
+\texttt{i} (questo comportamento è ottenibile con il
+\textit{left-shift} di 1 di \textit{posizioni}). Dopo aver iterato su
+tutto il pattern ottengo il vettore \texttt{U} correttamente caricato.
+\begin{esempio}
+  Immaginiamo un pattern semplice: \textit{caac}.\\
+  Il primo carattere è \texttt{c} e \texttt{i} è in posizione
+  0. \texttt{U} è ancora caricato con soli zeri. Quindi si ha:
+  \[
+    U[\mathtt{c}]=U[99]=
+    \begin{matrix}
+      0\\
+      0\\
+      0\\
+      0\\
+    \end{matrix}\vee
+    \begin{matrix}
+      1\\
+      0\\
+      0\\
+      0\\
+    \end{matrix}=
+    \begin{matrix}
+      1\\
+      0\\
+      0\\
+      0\\
+    \end{matrix}
+  \]
+  proseguo con \texttt{a} e shifto \texttt{i} di 1:
+  \[
+    U[\mathtt{a}]=U[97]=
+    \begin{matrix}
+      0\\
+      0\\
+      0\\
+      0\\
+    \end{matrix}\vee
+    \begin{matrix}
+      0\\
+      1\\
+      0\\
+      0\\
+    \end{matrix}=
+    \begin{matrix}
+      0\\
+      1\\
+      0\\
+      0\\
+    \end{matrix}
+  \]
+  il carattere successivo è ancora \texttt{a}:
+  \[
+    U[\mathtt{a}]=U[97]=
+    \begin{matrix}
+      0\\
+      1\\
+      0\\
+      0\\
+    \end{matrix}\vee
+    \begin{matrix}
+      0\\
+      0\\
+      1\\
+      0\\
+    \end{matrix}=
+    \begin{matrix}
+      0\\
+      1\\
+      1\\
+      0\\
+    \end{matrix}
+  \]
+  e infine trovo ancora \texttt{c}:
+  \[
+    U[\mathtt{c}]=U[99]=
+    \begin{matrix}
+      1\\
+      0\\
+      0\\
+      0\\
+    \end{matrix}\vee
+    \begin{matrix}
+      0\\
+      0\\
+      0\\
+      1\\
+    \end{matrix}=
+    \begin{matrix}
+      1\\
+      0\\
+      0\\
+      1\\
+    \end{matrix}
+  \]
+  Alla fine quindi $U[\mathtt{c}]=1001|_2=9$ e $U[\mathtt{a}]=0110|_2=6$
+\end{esempio}
+L'algortimo prosegue inizializzando la prima colonna a 1 se testo e
+pattern condividono il primo cararattere, 0 altrimenti.\\
+Si procede poi col calcolo delle colonne successive alla prima
+sfruttando la colonna precedente. Si procede con un
+\textit{left-shift} del valore rappresentante la colonna precedente
+con l'aggiunta di un 1 in testa. Si procede poi con l'\texttt{and} tra
+il risultato appena ottenuto e il valore di \texttt{U} nella posizione
+del carattere che sto considerando. Si controlla infine ogni valore
+rappreentante una colonna vedendo se presenta 1 nell'ultimo bit. Per
+ottenere questo risultato si procede con il \textit{left-shift} di uno
+di un'unità pari alla lunghezza del pattern meno uno e
+all'\texttt{and} con il valore rappresentante la colonna. Mi verra
+infatti restituito un binario avente valore o 0 o $2^{p-1}$ (nel caso di
+word grandi 3 avrei $100|_2=4$ avendo quindi 1 nell'ipotetica ultima
+riga della matrice, avendo quindi un match).\\
+Il limite di queto algoritmo è hardware e consiste nella
+rappresentazione (e quindi anche nelle operazioni) su binari oltre il
+numero di bit della word.
+\section*{Long Bitap}
+\end{document}

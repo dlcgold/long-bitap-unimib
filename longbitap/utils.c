@@ -9,8 +9,6 @@ char* substr(const char *src, int m, int n){
   // alloca la stringa di destinazione (più 1 per il carattere nullo)
   char *dest = (char*)malloc(sizeof(char) * (len + 1));
 
-  // extracts characters between m'th and n'th index from source string
-  // and copy them into the destination string
   // copia i caratteri tra gli indici volutiu dalla sorgente alla destinazione
   for (int i = m; i < n && (*src != '\0'); i++) {
     *dest = *(src + i);
@@ -27,18 +25,17 @@ char* substr(const char *src, int m, int n){
 // funzione che effettua la ricerca tramite algoritmo bitap con
 // lunghezza del pattern minore della grandezza della word
 // O(m + p)
-uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
+uint64_t* bitap(char* pattern, char* text, uint64_t p, uint64_t t){
 
   // inizializzo lunghezza di pattern e testo
   // inizializzo a 0 l'array T con le posizioni dei char nel pattern
-  //uint64_t m = strlen(pattern);
-  //uint64_t p = strlen(text);
-  uint64_t T[CHAR_MAX] = {};
+  
+  uint64_t U[CHAR_MAX] = {};
   // 1 esplcitamente a 64bit
   int64_t one = 1;
 
   // inizializzo la mia "matrice" di word
-  uint64_t* D = (uint64_t *)malloc(sizeof(uint64_t) * p);
+  uint64_t* D = (uint64_t *)malloc(sizeof(uint64_t) * t);
 
   // PREPROCESAMENTO
   // si parte con ogni posizione di T a 0
@@ -46,8 +43,8 @@ uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
   // spostando l'indice i lungo il pattern faccio un or di 1 shiftato di i
   // posizioni con il vecchio contenuto di T per un determinato char
   // alla fine del ciclo avrò l'array T caricato
-  for(unsigned int i = 0; i < m; i++){
-    T[(int)pattern[i]] |= (one<<i);
+  for(unsigned int i = 0; i < p; i++){
+    U[(int)pattern[i]] |= (one<<i);
   }
 
   // seguo l'algoritmo e setto 1 a M[0] sse pattern e text cominciano con lo
@@ -56,15 +53,15 @@ uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
 
 
   // formula dell'algoritmo per calcolare le colonne a partire dalla precedente
-  for(unsigned int i = 1; i < p; i++){
-    D[i] = ((D[i - 1] << one) | one) & T[(int)text[i]];
+  for(unsigned int i = 1; i < t; i++){
+    D[i] = ((D[i - 1] << one) | one) & U[(int)text[i]];
   }
-
+  
   // se ho un match metto 1 altrimenti 0
-  for(unsigned int i = 0; i < p; i++){
-    D[i] = ((D[i] & (one<<(m-1))) != 0) ? 1 : 0;
+  for(unsigned int i = 0; i < t; i++){
+    D[i] = ((D[i] & (one<<(p - 1))) != 0) ? 1 : 0;
   }
-
+  
   // resituisco l'array
   return D;
 }
@@ -96,15 +93,15 @@ uint64_t* countfirst(uint64_t* array, uint64_t size){
 void bitapLong(char* pattern, char* text){
 
   // inizializzo lunghezza di pattern e testo (-1 per terminatore)
-  uint64_t m = strlen(pattern) - 1;
-  uint64_t p = strlen(text) - 1;
+  uint64_t p = strlen(pattern) - 1;
+  uint64_t t = strlen(text) - 1;
 
   // inizializzo la grandezza massima della word
   uint64_t w = __WORDSIZE;
   //uint64_t w = 4;
   
   // conto in quanti sottopattern devo dividere il pattern per non eccedere da w
-  unsigned int npatterns = ceil((double) m / w);
+  unsigned int npatterns = ceil((double) p / w);
 
   
   // alloco un array di stringhe per contenere i vari sottopattern
@@ -118,8 +115,8 @@ void bitapLong(char* pattern, char* text){
   unsigned int begin = 0;
   char* sub;
   for(unsigned int i = 0; i < npatterns; i++){
-    if(m - begin < w)
-      sub = substr(pattern, begin, m);
+    if(p - begin < w)
+      sub = substr(pattern, begin, p);
     else
       sub = substr(pattern, begin, begin + w);
     strcpy(patterns[i], sub);
@@ -139,10 +136,10 @@ void bitapLong(char* pattern, char* text){
   uint64_t count = 0;
 
   // vettore in cui carico il bitap del primo sottopattern
-  uint64_t* curr = bitap(patterns[0], text, patterlength, p);
+  uint64_t* curr = bitap(patterns[0], text, patterlength, t);
 
   // array con gli indici di fine match 
-  uint64_t* firsts = countfirst(curr, p);
+  uint64_t* firsts = countfirst(curr, t);
 
   // variabile d'appoggio per spostarsi lungo gli indici di match del
   // primo sottopattern
@@ -160,11 +157,11 @@ void bitapLong(char* pattern, char* text){
   // del numero di caratteri già valutati). Infine se ho altri mathc nel primo
   // ripeto partendo da quel match
   if(npatterns == 1){
-    for(unsigned int i = 0; i < p; i++){
+    for(unsigned int i = 0; i < t; i++){
       if(curr[i] == 1){
 	count++;
 	printf("occurrance starting at index: %s%ld%s\n",
-	       BLUE, i - (m - 1), RESET);
+	       BLUE, i - (p - 1), RESET);
       }
     }
     free(curr);
@@ -206,7 +203,7 @@ void bitapLong(char* pattern, char* text){
       // 1 al counter delle occorrenze
       if(curr[patterlength - 1] == 1){
 	printf("occurrance starting at index: %s%ld%s\n",
-	       BLUE, (currentfirst + 1) - m, RESET);
+	       BLUE, (currentfirst + 1) - p, RESET);
 	count++;
       }
 
@@ -217,7 +214,7 @@ void bitapLong(char* pattern, char* text){
   }
 
   // stampoo il numero di occorrenze
-  printf("total number of occurences: %s%ld%s\n",GREEN, count, RESET);
+  printf("\ntotal number of occurences: %s%ld%s\n",GREEN, count, RESET);
 
   // libero la memoria
   if(npatterns != 1){

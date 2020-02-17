@@ -11,7 +11,7 @@ char* substr(const char *src, int m, int n){
 
   // extracts characters between m'th and n'th index from source string
   // and copy them into the destination string
-  // copia i caratteri tra gli indici volutiu dalla sorgente alla destinazione
+  // copia i caratteri tra gli indici voluti dalla sorgente alla destinazione
   for (int i = m; i < n && (*src != '\0'); i++) {
     *dest = *(src + i);
     dest++;

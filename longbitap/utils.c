@@ -1,7 +1,7 @@
 #include "utils.h"
 
 // funzione per sottostringa da indice n a indice m
-// O(|substr|)
+// O(n - m)
 char* substr(const char *src, int m, int n){
   // lunghezza della stringa di destinazione
   int len = n - m;
@@ -36,9 +36,9 @@ uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
   uint64_t T[CHAR_MAX] = {};
   // 1 esplcitamente a 64bit
   int64_t one = 1;
-  uint64_t approx = p / m;
+
   // inizializzo la mia "matrice" di word
-  uint64_t* D = (uint64_t *)malloc(sizeof(uint64_t) * (p + approx));
+  uint64_t* D = (uint64_t *)malloc(sizeof(uint64_t) * p);
 
   // PREPROCESAMENTO
   // si parte con ogni posizione di T a 0
@@ -60,45 +60,39 @@ uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
     D[i] = ((D[i - 1] << one) | one) & T[(int)text[i]];
   }
 
-  // guardo se ho match o meno guardando l'ultimo bit
-  // per comodità setto quella posizione a 1 specificando
-  // che lì termina un match
-  /* bool find = false; */
-  /* D[p] = 1; */
-  /* for(unsigned int i = 0; i < p; i++){ */
-  /*   //D[i] = ((D[i] & (one<<(m-1))) != 0) ? 1 : 0; */
-  /*   if((D[i] & (one<<(m-1))) != 0){ */
-  /*     D[i] = 1; */
-  /*     if(find == false){ */
-  /* 	D[p] = i; */
-  /* 	find = true; */
-  /*     } */
-  /*   }else{ */
-  /*     D[i] = 0; */
-  /*   } */
-  /* } */
-
-  uint64_t end = p;
+  // se ho un match metto 1 altrimenti 0
   for(unsigned int i = 0; i < p; i++){
-    if((D[i] & (one<<(m-1))) != 0){
-      D[i] = 1;
-      D[end] = i;
-      end++;
-    }else{
-      D[i] = 0;
-    }
+    D[i] = ((D[i] & (one<<(m-1))) != 0) ? 1 : 0;
   }
-  /* print(D,p); */
-  /* puts("\n"); */
-  /* print(D,p+approx); */
-  /* puts("\n"); */
+
+  // resituisco l'array
   return D;
 }
 
+// funzione che resituisce gli indici delle occorrenze
+// da usare per il primo sottopattern
+// O(p)
+uint64_t* countfirst(uint64_t* array, uint64_t size){
+  // inizializzo un counter e conto le occorrenze
+  uint64_t count = 0;
+  for(unsigned int i = 0; i < size; i++){
+    if(array[i] == 1)
+      count++;
+  }
 
-// funzione che effettua il bitap su pattern più lunghi della grandezza della
-// word
-// O(p * ceil(m / w))
+  // alloco l'array con gli indici, lo carico e lo restituisco
+  uint64_t j = 0;
+  uint64_t* ret = (uint64_t*)malloc(sizeof(uint64_t) * count);
+  for(unsigned int i = 0; i < size; i++){
+    if(array[i] == 1){
+      ret[j] = i;
+      j++;
+    }
+  }
+  return ret;
+}
+// funzione che effettua il bitap su pattern anche più lunghi della grandezza
+// della word
 void bitapLong(char* pattern, char* text){
 
   // inizializzo lunghezza di pattern e testo (-1 per terminatore)
@@ -132,189 +126,154 @@ void bitapLong(char* pattern, char* text){
     begin += w;
     free(sub);
   }
-  // creo la matrice coi singoli bitap per sottopattern
-  /* uint64_t** DL = (uint64_t **)malloc(npatterns * sizeof(uint64_t *)); */
-  /* for (unsigned int i=0; i < npatterns; i++) */
-  /*   DL[i] = (uint64_t *)malloc(p * sizeof(uint64_t)); */
 
-  // carico le righe con i singoli dei bitap
-  // se ho un pattern lungo meno di w non serve verificare nulla
-  // altrimenti verifico di essere nei pattern successivi al primo e
-  // se nel pattern precedente non ho un match che termina quando
-  // dovrebbe iniziare il match che ho col pattern successivo setto a 0
-  // in modo che a priori non si abbiano pattern possibili
-  // avrò i match complessivi nell'ultima riga della matrice
-  // O(ceil(m/w)*(2p+m)) con p >> m
-  /* uint64_t* bitapres; */
-  /* for(unsigned int i = 0; i < npatterns; i++){ */
-  /*   if(i == 0){ */
-  /*     memcpy(DL[i], bitap(patterns[i], text), p * sizeof(uint64_t)); */
-  /*   }else{ */
-  /*     bitapres = bitap(patterns[i], text); */
-  /*     for(unsigned int j = 0; j < p; j++){ */
-  /* 	DL[i][j] = (bitapres[j] == 1 && DL[i - 1][j - strlen(patterns[i])] == 1) */
-  /* 	  ? 1 : 0; */
-  /*     } */
-  /*     free(bitapres); */
-  /*   } */
-  /* } */
-  // stampa matrici
-  /*for(unsigned int i = 0; i < npatterns; i++){
-    printf("pattern: %s\n", patterns[i]);
-    for(unsigned int j = 0; j < p; j++){
-    printf("%ld ", DL[i][j]);
-    }
-    puts("\n\n\n\n");
-    }*/
+  // variabile che contiene la lunghezza del sottopattern analizzato
+  // se ho un solo sottopattern vedo quanto è lungo
+  // altrimenti so che è lungo una word
+  uint64_t patterlength = (npatterns == 1) ? strlen(patterns[0]) : w;
 
-  // tengo un array con i match del sottopattern precedente, corrente e
-  // risultante. Ad ogni giro in prev carico il precedente risultante e in curr
-  // il bitap del sottapttern attuale, salvando in res i match del complesso dei
-  // sottopattern precedenti. A priori so che in ret avrò 0 fino agli indici
-  // inferiori alla lunghezza del mio attuale sottopattern.
-  uint64_t* prev = (uint64_t*)malloc(sizeof(uint64_t) * (p + 1));
-  uint64_t* curr;
-  uint64_t patternlength = (npatterns != 1) ? w : strlen(patterns[0]);
-  uint64_t* res = bitap(patterns[0], text, patternlength, p);
-  int64_t begone = 0;
-  uint64_t begpat = 0;
+  //variabile per muoversi lungo i match del primo sottopattern
+  uint64_t shiftfirst = 0;
 
-  /* for(unsigned int i = 1; i < npatterns; i++){ */
-  /*   printf("%s:\n", patterns[i]); */
-      
-  /*   if(i != npatterns -1){ */
-  /*     patternlength = w; */
-  /*     begpat += w; */
-  /*   }else{ */
-  /*     patternlength = strlen(patterns[i]); */
-  /*     begpat += strlen(patterns[i]); */
-  /*   } */
-  /*   // carico in begone la posizione del primo match per risparmiare calcoli */
-  /*   //begone = res[p]; */
-  /*   // printf("%ld %ld\n", begpat,begone); */
+  // variabile per il conto dei match
+  uint64_t count = 0;
 
-  /*   //print(prev, p+1); */
-  /*   // copio res in prev a partire dal primo 1 */
-  /*   memcpy(prev, res, p * sizeof(uint64_t)); */
-  /*   printf("prev:\t"); */
-  /*   print(prev, p+1); */
-  /*   puts("\n"); */
-  /*   // carico cur */
-  /*    printf("curr:\t"); */
-  /*   curr = bitap(patterns[i], text, patternlength, p); */
-  /*   print(curr, p+1); */
-  /*   puts("\n"); */
-  /*   // se begone è -1 significa che non ho */
-  /*   // match e in tal caso interrompo */
-  /*   if(begone == -1){ */
-  /*     printf("no occurences"); */
-  /*     exit(-1); */
-  /*   } */
-  /*   //printf("%ld\n", begone + begpat); */
-  /*   // carico res  */
-  /*   for(unsigned int j = 0; j < p; j++){ */
-  /*     res[j] = (curr[j] == 1 && prev[j - strlen(patterns[i])] == 1) ? 1 : 0; */
-  /*   } */
-  /*   printf("res:\t"); */
-  /*   print(res, p+1); */
-  /*   puts("\n"); */
-  /* } */
-  /* printf("----------------------------------------------------\ndef:\t"); */
-  /* print(res, p+1); */
-  /* puts("\n"); */
-  uint64_t end = p;
-  uint64_t count2 = 0;
-  uint64_t* curr2;
-  char* wind;
-  uint64_t check = res[end];
-  while(npatterns !=1 && check != 0){
-    //printf("%ld %ld\n", end, res[end]);
-    for(unsigned int i = 1; i < npatterns; i++){
-      //printf("%ld %ld\n", res[end], res[end] + strlen(patterns[i]));
-      wind = substr(text, check + 1, check + strlen(patterns[i]) + 1);
-      curr2 = bitap(patterns[i], wind, strlen(patterns[i]), strlen(wind));
-      
-      if(curr2[strlen(wind)-1] != 1)
-	break;
-      check += strlen(wind);
-    }
-    if(curr2[strlen(wind)-1] == 1){
-      printf("occurrance starting at %ld\n", (check + 1) - (strlen(pattern) - 1));
-      count2++;
-    }
-   
-    end++;
-    check = res[end];
-  }
-  uint64_t* res2;
+  // vettore in cui carico il bitap del primo sottopattern
+  uint64_t* curr = bitap(patterns[0], text, patterlength, p);
+
+  // stringa con la finestra di text da analizzare
+  char* window;
+
+  // array con gli indici di fine match 
+  uint64_t* firsts = countfirst(curr, p);
+
+  // variabile d'appoggio per spostarsi lungo gli indici di match del
+  // primo sottopattern
+  uint64_t currentfirst = firsts[0];
+
+  // se ho un solo pattern significa che ho un pattern lungo meno di w
+  // quindi il bitap calcolato su patterns[0] è già quello finale
+  // e posso vedere le occorrenze
+  // altrimenti per ogni occorrenza del primo sottopattern itertaivamente
+  // verifico i sottopattern successivi spostanto la finestra nel testo
+  // evalutando solo le ultime caselle dei vari bitap
+  // se sono 0 mi fermo e passo al match sul primo sottopattern successivo
+  // altrimenti itero fino ad esaurimento sottopattern e se all'ultima
+  // iterazione ho alla fine ho un match (uso patternlength per tenere conto
+  // del numero di caratteri già valutati). Infine se ho altri mathc nel primo
+  // ripeto partendo da quel match
   if(npatterns == 1){
-    res2 = bitap(pattern, text, m, p);
     for(unsigned int i = 0; i < p; i++){
-      if(res[i] == 1){
-	count2++;
+      if(curr[i] == 1){
+	count++;
 	printf("occurrance starting at index %ld\n", i - (m - 1));
       }
     }
+    free(curr);
+  }else{
+    // fino a che ho match col primo sottopattern itero
+    while(currentfirst){
+      // itero per ogni sottopattern
+      for(unsigned int i = 1; i < npatterns; i++){
+	// valuto la lunghezza del pattern sapendo che solo l'ultimo potrebbe
+	// essere lungo meno di w
+	patterlength = (i != npatterns - 1)
+	  ? w : strlen(patterns[npatterns - 1]);
+	
+	// calcolo la finestra di analisi ovvero la sottostringa di text che
+	// parte dall'indice del match precedente ed è lunga quanto il
+	// sottopattern in analisi
+	window = substr(text, currentfirst + 1,
+			currentfirst + patterlength + 1);
+	
+	// chiamo bitap col sottopattern in analisi su quella finestra
+	curr = bitap(patterns[i], window, patterlength, patterlength);
+
+	// se alla fine del bitap non ho un match mi fermo
+	if(curr[patterlength - 1] != 1){
+	  free(curr);
+	  break;
+	}
+	
+	// altrimenti aggiorno il conteggio dell'indice dell'ultimo match e
+	// itero nuovamente
+	currentfirst += patterlength;
+      }
+      
+      // se alla fine ho un 1 alla fine dell'ultimo bitap stampo l'inizio
+      // dell'occorrenza sapendo che il pattern nel complesso è lungo m e sommo
+      // 1 al counter delle occorrenze
+      if(curr[patterlength - 1] == 1){
+	printf("occurrance starting at %ld\n", (currentfirst + 1) - m);
+	count++;
+      }
+
+      // mi sposto al match del primo pattern successivo
+      shiftfirst++;
+      currentfirst = firsts[shiftfirst];
+    }
   }
-    
+
+  // stampoo il numero di occorrenze
+  printf("total number of occurences: %ld\n", count);
+
   // libero la memoria
-  /* if(npatterns != 1){ */
-  /*   free(curr); */
-  /* } */
-  /* free(prev); */
-
-  /* // inizializzo il count dei match */
-  /* unsigned count = 0; */
-
-  /* // guardo quali presentano 1 nell'ultima riga, stampo l'indice di partenza */
-  /* // e li conto */
-  /* /\* for(unsigned int i = 0; i < p; i++){ *\/ */
-  /* /\*   if(DL[npatterns-1][i] == 1){ *\/ */
-  /* /\*     count++; *\/ */
-  /* /\*     printf("occurrance starting at index %d\n", i - (m-1)); *\/ */
-  /* /\*   } *\/ */
-  /* /\* } *\/ */
-
-  /* for(unsigned int i = 0; i < p; i++){ */
-  /*   if(res[i] == 1){ */
-  /*     count++; */
-  /*     printf("occurrance starting at index %ld\n", i - (m - 1)); */
-  /*   } */
-  /* } */
-  /* // stampo conteggio */
-  printf("total number of occurences: %d\n", count2);
-
-
-  /* // libero la memoria */
-  /* /\*for (unsigned int i=0; i < npatterns; i++) */
-  /*   free(DL[i]); */
-  /*   free(DL);*\/ */
-  /* for (unsigned int i = 0; i < npatterns; i++) */
-  /*   free(patterns[i]); */
-  /* free(patterns); */
-  /* free(res); */
+  if(npatterns != 1){
+    free(curr);
+    free(window);
+  }
+  free(firsts);
+  for(unsigned int i = 0; i < npatterns; i++)
+    free(patterns[i]);
+  free(patterns);
 }
 
 char* load_file(char* path)
 {
+  // inizializzo il punattore a char per la stringa
   char* buffer = 0;
-  long length;
-  FILE * f = fopen (path, "r");
+
+  // inizlaizzo la variabile per la lunghezza del file e della stringa
+  long length = 0;
+
+  // apro il file in lettura col path passato come argomento
+  FILE* f = fopen (path, "r");
+
+  // se non riesco ad aprire un file con quel path lo segnalo
   if (f == NULL) {
-    printf("%s\n", path);
-    fprintf(stderr, "Can't open input file\n");
+    //printf("%s\n", path);
+    fprintf(stderr, "Can't open input file %s\n", path);
     exit(1);
   }else{
-    fseek (f, 0, SEEK_END);
-    length = ftell (f);
-    fseek (f, 0, SEEK_SET);
-    buffer = (char*)malloc ((length+1)*sizeof(char));
+    
+    // sposto il puntatore del filen f alla fine con SEEK_END
+    fseek(f, 0, SEEK_END);
+
+    // dato che ftell mi restituisce la posizione attuale del puntatore f che si
+    // muove sul file calcolo la lunghezza del file visto che l'ho messo alla
+    // fine con fseek
+    length = ftell(f);
+
+    // metto il puntatore f all'inizio con SEEK_SET
+    fseek(f, 0, SEEK_SET);
+
+    // alloco un array di char di lunghezza adeguata
+    buffer = (char*)malloc((length + 1) * sizeof(char));
+
+    // se effettivamente il file contiene qualcosa (e quindi ho allocato buffer)
+    // con una certa lunghezza uso fread per leggere il file e caricare la
+    // stringa
     if (buffer){
-      fread (buffer, sizeof(char), length, f);
+      fread(buffer, sizeof(char), length, f);
     }
+
+    // chiudo il file
     fclose (f);
   }
+  // libero la memoria
   free(f);
+
+  // restituisco l'array di char
   return buffer;
 }
 

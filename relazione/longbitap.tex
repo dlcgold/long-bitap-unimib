@@ -425,7 +425,11 @@ a questa stima vanno sommati i costi della prima chiamata a
 \texttt{bitap}, ovvero $\sim O(w + t)$ e del calcolo deglin indici di
 partenza, ovvero $\sim O(t)$. Si nota come non si abbia più \texttt{t}
 moltiplicato per il numero di sottopatterns (fattore che rallentava
-l'algoritmo in presenza di testi molto lunghi).
+l'algoritmo in presenza di testi molto lunghi).\\
+\textit{Una soluzione del genere si presta molto bene alla
+  programmazione concorrente in quanto posso cercare i match a partire
+dai vari match del primo sottopattern in contemporanea, al più
+ricontrollando l'ordine dei risultati ottenuti.}
 \newpage
 \section*{Tabella Test}
 In termini pratici (ma meno oggettivi) sulla mia macchina
@@ -460,7 +464,8 @@ test:
     \item numero di occorrenze: $60$
   \end{itemize}
 \end{enumerate}
-Vediamo quindi una tabella riassuntiva coi tempi calcolati da \texttt{time}:
+Vediamo quindi una tabella riassuntiva coi tempi calcolati da
+\texttt{time} (una media degli stessi):
 \begin{center}
   \begin{tabular}{|c|c|c|c|c|}
     \hline

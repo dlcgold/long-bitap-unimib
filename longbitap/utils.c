@@ -268,7 +268,6 @@ char* load_file(char* path)
 	fprintf(stderr, "%sunexpected error %s\n%s", RED, path, RESET);
 	exit(1);
       }
-	
     }
 
     // chiudo il file

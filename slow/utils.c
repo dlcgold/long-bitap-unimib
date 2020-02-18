@@ -142,9 +142,6 @@ void bitapLong(char* pattern, char* text){
   }
 
   // libero la memoria
-  if(npatterns != 1){
-    free(curr);
-  }
   free(prev);
 
   // inizializzo il count dei match
@@ -184,8 +181,13 @@ char* load_file(char* path)
     length = ftell (f);
     fseek (f, 0, SEEK_SET);
     buffer = (char*)malloc ((length+1)*sizeof(char));
+    int r;
     if (buffer){
-      fread (buffer, sizeof(char), length, f);
+      r = fread (buffer, sizeof(char), length, f);
+       if(r == -1){
+	fprintf(stderr, "unexpected error %s\n", path);
+	exit(1);
+      }
     }
     fclose (f);
   }

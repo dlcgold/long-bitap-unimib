@@ -16,7 +16,7 @@ make
 ```
 ./bitaplong.out --pattern <pattern> --text <text>
 ```
-oppure:
+	oppure:
 ```
 ./bitaplong.out -p <pattern> -t <text>
 ```

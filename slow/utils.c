@@ -64,7 +64,7 @@ uint64_t* bitap(char* pattern, char* text, uint64_t m, uint64_t p){
   // che lì termina un match
 
   for(unsigned int i = 0; i < p; i++){
-    D[i] = ((D[i] & (one<<(m-1))) != 0) ? 1 : 0;
+    D[i] = ((D[i] & (one << (m - 1))) != 0) ? 1 : 0;
   }
 
   return D;

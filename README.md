@@ -4,6 +4,8 @@
 Implementazione dell'algortimo _bitap_ (detto anche _shift-and_) per pattern
 più lunghi di una word della cpu.
 In input si hanno due file, uno per il pattern e uno per il testo.
+Nella cartella slow è presente una seconda versione dell'algoritmo generalmente più
+lenta ma comoda nel caso in cui le occorrenze sono in altissima numerosità.
 
 ### USAGE
 

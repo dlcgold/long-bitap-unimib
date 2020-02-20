@@ -1,4 +1,4 @@
-#include "utils.h"
++#include "utils.h"
 
 // funzione per sottostringa da indice n a indice m
 // O(|substr|)
@@ -191,7 +191,7 @@ char* load_file(char* path)
     }
     fclose (f);
   }
-  free(f);
+  //free(f);
   return buffer;
 }
 

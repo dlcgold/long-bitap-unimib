@@ -2,8 +2,8 @@ OBJS	= main.o utils.o cmdline.o
 SOURCE	= main.c utils.c cmdline.c
 HEADER	= utils.h cmdline.h
 OUT	= bitaplong.out
-CC	 = gcc
-FLAGS	 = -g -c -Wall -Wall -O2
+CC	 = clang
+FLAGS	 = -g -c -Wall -Wall
 LFLAGS	 = -lm
 
 all: $(OBJS)

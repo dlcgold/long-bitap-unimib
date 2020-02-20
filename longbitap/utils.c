@@ -189,6 +189,7 @@ void bitapLong(char* pattern, char* text){
 
 	// se alla fine del bitap non ho un match mi fermo
 	if(curr[patterlength - 1] != 1){
+	  //free(curr);
 	  break;
 	}
 	

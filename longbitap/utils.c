@@ -120,7 +120,7 @@ void bitapLong(char* pattern, char* text){
       sub = substr(pattern, begin, begin + w);
     strcpy(patterns[i], sub);
     begin += w;
-    free(sub);
+    //free(sub);
   }
 
   // variabile che contiene la lunghezza del sottopattern analizzato
@@ -189,7 +189,6 @@ void bitapLong(char* pattern, char* text){
 
 	// se alla fine del bitap non ho un match mi fermo
 	if(curr[patterlength - 1] != 1){
-	  free(curr);
 	  break;
 	}
 	
@@ -274,7 +273,7 @@ char* load_file(char* path)
     fclose (f);
   }
   // libero la memoria
-  free(f);
+  //free(f);
 
   // restituisco l'array di char
   return buffer;

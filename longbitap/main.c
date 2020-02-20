@@ -16,7 +16,7 @@ int main(int argc, char** argv){
   // chiamo l'algoritmo
   bitapLong(pattern, text);
   // libero la memoria
-  free(text);
-  free(pattern);
+  /* free(text); */
+  /* free(pattern); */
   return 0;
 }
